@@ -1,3 +1,6 @@
+import 'package:flutter/material.dart';
+import 'package:pedido_facil/util/util.dart';
+
 class UtilForm {
   static String? valTextFormField(
       {required String valor,
@@ -59,5 +62,27 @@ class UtilForm {
 
   static String? _valTamMin(String valor, int tamMin) {
     return valor.length < tamMin ? 'O tamanho minimo de digitos é ' + tamMin.toString() : null;
+  }
+
+  static Scaffold getFormContainerPadrao(String tituloForm, saveFnc, deleteFnc, Form form) {
+    var _botoes = <Widget>[IconButton(icon: Icon(Icons.save), onPressed: () => saveFnc())];
+    if (deleteFnc != null)
+      _botoes.add(IconButton(icon: Icon(Icons.delete), onPressed: () => deleteFnc()));
+
+    return Scaffold(
+        backgroundColor: Util.backColorPadrao,
+        appBar: AppBar(
+          title: Text(tituloForm),
+          actions: _botoes,
+        ),
+        body: Container(
+            margin: new EdgeInsets.all(Util.marginScreenPadrao),
+            child: Container(
+              padding: EdgeInsets.all(Util.paddingFormPadrao),
+              decoration: new BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: new BorderRadius.circular(Util.borderRadiousPadrao)),
+              child: form,
+            )));
   }
 }

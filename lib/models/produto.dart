@@ -1,4 +1,5 @@
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:pedido_facil/util/util_model.dart';
 
 import 'IData.dart';
 
@@ -6,7 +7,7 @@ class Produto extends IData {
   //final String id;
   final String nm;
   final double vlVenda;
-  final double vlCompra;
+  final double vlCusto;
   final int? diasConsumo;
   final String detalhe;
   final Image? foto;
@@ -15,21 +16,15 @@ class Produto extends IData {
     id,
     required this.nm,
     required this.vlVenda,
-    this.vlCompra = 0,
+    this.vlCusto = 0,
     this.detalhe = '',
     this.foto,
     this.diasConsumo,
   }) : super(id: id);
 
   Produto clone() {
-    return Produto(id: id, nm: nm, vlCompra: vlCompra, vlVenda: vlVenda, detalhe: detalhe);
+    return Produto(id: id, nm: nm, vlCusto: vlCusto, vlVenda: vlVenda, detalhe: detalhe);
   }
 
-  getNmIniciais() {
-    var nomes = this.nm.split(' ');
-    var vIniciais = nomes.length > 1
-        ? nomes[0].substring(0, 1).toString() + nomes[1].substring(0, 1).toString()
-        : nomes[0].substring(0, 2);
-    return vIniciais;
-  }
+  getNmIniciais() => UtilModel.getNmIniciais(this.nm);
 }

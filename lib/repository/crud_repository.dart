@@ -35,7 +35,7 @@ class CrudLocalStorage extends ICrudRepository {
         (value) => Produto(
             id: newReg.id,
             nm: newReg.nm,
-            vlCompra: newReg.vlCompra,
+            vlCusto: newReg.vlCusto,
             vlVenda: newReg.vlVenda,
             detalhe: newReg.detalhe));
   }

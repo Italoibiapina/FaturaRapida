@@ -1,33 +1,43 @@
 import 'package:flutter/material.dart';
+import 'package:pedido_facil/provider/cliente_provider.dart';
 import 'package:pedido_facil/provider/produto_provider.dart';
+import 'package:pedido_facil/provider/venda_provider.dart';
+import 'package:pedido_facil/repository/cliente_repository.dart';
+import 'package:pedido_facil/repository/produto_repository.dart';
+import 'package:pedido_facil/repository/venda_repository.dart';
 import 'package:pedido_facil/routes/app_routes.dart';
 import 'package:pedido_facil/util/util.dart';
+import 'package:pedido_facil/view/cliente/cliente_form.dart';
+import 'package:pedido_facil/view/cliente/cliente_list.dart';
 import 'package:pedido_facil/view/inicio/inicio.dart';
 import 'package:pedido_facil/view/produto/produto_form.dart';
 import 'package:pedido_facil/view/produto/produto_list.dart';
+import 'package:pedido_facil/view/venda/venda_form.dart';
+import 'package:pedido_facil/view/venda/venda_list.dart';
 import 'package:provider/provider.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(PedidoFacil());
 }
 
-class MyApp extends StatefulWidget {
+class PedidoFacil extends StatefulWidget {
   static const TextStyle optionStyle = TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
 
   static List<Widget> _widgetOptions = <Widget>[
     Inicio(),
+    VendaList(),
+    Text('Index 1: Orçamento', style: optionStyle),
+    //ProdutoForm(),
+    ClienteList(),
     ProdutoList(),
-    ProdutoForm(),
-    Text('Index 0: Home', style: optionStyle),
-    Text('Index 1: Business', style: optionStyle),
-    Text('Index 2: School', style: optionStyle),
+    Text('Index 2: Compartilhar', style: optionStyle),
   ];
 
   @override
-  _MyAppState createState() => _MyAppState();
+  _PedidoFacil createState() => _PedidoFacil();
 }
 
-class _MyAppState extends State<MyApp> {
+class _PedidoFacil extends State<PedidoFacil> {
   int _selectedIndex = 0;
 
   void _onItemTapped(int index) {
@@ -40,9 +50,9 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(
-          create: (ctx) => ProdutoProvider(),
-        )
+        ChangeNotifierProvider(create: (ctx) => ProdutoProvider(ProdutoRepository())),
+        ChangeNotifierProvider(create: (ctx) => ClienteProvider(ClienteRepository())),
+        ChangeNotifierProvider(create: (ctx) => VendaProvider(VendaRepository()))
       ],
       child: MaterialApp(
         title: 'Flutter Demo',
@@ -52,12 +62,16 @@ class _MyAppState extends State<MyApp> {
         routes: {
           AppRoutes.INICIO: (context) => Inicio(),
           AppRoutes.PRODUTO_LIST: (context) => ProdutoList(),
-          AppRoutes.PRODUTO_FORM: (context) => ProdutoForm()
+          AppRoutes.PRODUTO_FORM: (context) => ProdutoForm(),
+          AppRoutes.CLIENTE_LIST: (context) => ClienteList(),
+          AppRoutes.CLIENTE_FORM: (context) => ClienteForm(),
+          AppRoutes.VENDA_LIST: (context) => VendaList(),
+          AppRoutes.VENDA_FORM: (context) => VendaForm(),
         },
         home: Scaffold(
           backgroundColor: Util.backColorPadrao,
           body: Center(
-            child: MyApp._widgetOptions.elementAt(_selectedIndex),
+            child: PedidoFacil._widgetOptions.elementAt(_selectedIndex),
           ),
           bottomNavigationBar: BottomNavigationBar(
             items: const <BottomNavigationBarItem>[
