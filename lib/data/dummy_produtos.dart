@@ -16,7 +16,7 @@ final Dummy_produtos = {
       detalhe: "Perfumado, elegante e moderno vai fazer você arrazar"),
   '3': Produto(
       id: '3',
-      nm: "Produto 2",
+      nm: "Produto 3",
       vlCusto: 100,
       vlVenda: 300,
       detalhe: "Osso artifical para cachorro"),

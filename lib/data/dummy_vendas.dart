@@ -1,8 +1,11 @@
 import 'package:pedido_facil/models/venda.dart';
+import 'package:pedido_facil/models/venda_item.dart';
 
 import 'dummy_clientes.dart';
+import 'dummy_produtos.dart';
 
 final clis = {...Dummy_clientes};
+final prods = {...Dummy_produtos};
 // ignore: non_constant_identifier_names
 final Dummy_vendas = {
   '1': Venda(
@@ -10,6 +13,10 @@ final Dummy_vendas = {
       nrPed: 'PED001',
       dtPed: DateTime.now(),
       cli: clis.values.elementAt(0),
+      itens: [
+        VendaItem(id: '1', prod: prods.values.elementAt(1), qtd: 2),
+        VendaItem(id: '2', prod: prods.values.elementAt(2), qtd: 1)
+      ],
       isPago: true,
       isEnt: true),
   '2': Venda(
@@ -17,6 +24,10 @@ final Dummy_vendas = {
       nrPed: 'PED002',
       dtPed: DateTime.now(),
       cli: clis.values.elementAt(1),
+      itens: [
+        VendaItem(id: '3', prod: prods.values.elementAt(1), qtd: 1),
+        VendaItem(id: '4', prod: prods.values.elementAt(2), qtd: 2)
+      ],
       isPago: false,
       isEnt: true),
   '3': Venda(
@@ -24,6 +35,10 @@ final Dummy_vendas = {
       nrPed: 'PED003',
       dtPed: DateTime.now(),
       cli: clis.values.elementAt(2),
+      itens: [
+        VendaItem(id: '5', prod: prods.values.elementAt(1), qtd: 1),
+        VendaItem(id: '6', prod: prods.values.elementAt(2), qtd: 1)
+      ],
       isPago: true,
       isEnt: false),
   '4': Venda(
@@ -31,6 +46,10 @@ final Dummy_vendas = {
       nrPed: 'PED004',
       dtPed: DateTime.now(),
       cli: clis.values.elementAt(2),
+      itens: [
+        VendaItem(id: '7', prod: prods.values.elementAt(1), qtd: 2),
+        VendaItem(id: '8', prod: prods.values.elementAt(2), qtd: 2)
+      ],
       isPago: false,
       isEnt: false),
 };

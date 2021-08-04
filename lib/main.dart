@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:pedido_facil/data/dummy_vendas.dart';
+import 'package:pedido_facil/models/venda.dart';
 import 'package:pedido_facil/provider/cliente_provider.dart';
 import 'package:pedido_facil/provider/produto_provider.dart';
 import 'package:pedido_facil/provider/venda_provider.dart';
@@ -23,10 +25,13 @@ void main() {
 class PedidoFacil extends StatefulWidget {
   static const TextStyle optionStyle = TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
 
+  static final Map<String, Object> itens = {...Dummy_vendas};
+  static final Venda venda = itens.values.last as Venda;
+
   static List<Widget> _widgetOptions = <Widget>[
     Inicio(),
     VendaList(),
-    Text('Index 1: Orçamento', style: optionStyle),
+    VendaForm(venda: venda),
     //ProdutoForm(),
     ClienteList(),
     ProdutoList(),
