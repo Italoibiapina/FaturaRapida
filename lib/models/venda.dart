@@ -4,11 +4,13 @@ import 'package:pedido_facil/models/venda_item.dart';
 import 'IData.dart';
 
 class Venda extends IData {
-  final String nrPed;
-  final DateTime dtPed;
+  late String nrPed;
+  late DateTime dtPed;
   final DateTime? dtVencPed;
   final Cliente cli;
   final List<VendaItem> itens;
+  double vlDesconto;
+  double vlFrete;
   final bool isPago;
   final bool isEnt;
 
@@ -41,16 +43,18 @@ class Venda extends IData {
     return "";
   }
 
-  Venda({
-    id,
-    required this.nrPed,
-    required this.dtPed,
-    this.dtVencPed,
-    required this.cli,
-    required this.itens,
-    required this.isPago,
-    required this.isEnt,
-  }) : super(id: id);
+  Venda(
+      {id,
+      required this.nrPed,
+      required this.dtPed,
+      this.dtVencPed,
+      required this.cli,
+      required this.itens,
+      required this.isPago,
+      required this.isEnt,
+      this.vlDesconto = 0.0,
+      this.vlFrete = 0.0})
+      : super(id: id);
 
   Venda clone() {
     return Venda(

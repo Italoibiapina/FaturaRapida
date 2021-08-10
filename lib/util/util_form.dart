@@ -69,12 +69,34 @@ class UtilForm {
     if (deleteFnc != null)
       _botoes.add(IconButton(icon: Icon(Icons.delete), onPressed: () => deleteFnc()));
 
-    return Scaffold(
+    final AppBar appBar = AppBar(
+      title: Text(tituloForm),
+      actions: _botoes,
+    );
+
+    return getFormContainerPadraoAppCustom(appBar, form);
+
+    /* return Scaffold(
         backgroundColor: Util.backColorPadrao,
         appBar: AppBar(
           title: Text(tituloForm),
           actions: _botoes,
         ),
+        body: Container(
+            margin: new EdgeInsets.all(Util.marginScreenPadrao),
+            child: Container(
+              padding: EdgeInsets.all(Util.paddingFormPadrao),
+              decoration: new BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: new BorderRadius.circular(Util.borderRadiousPadrao)),
+              child: form,
+            ))); */
+  }
+
+  static Scaffold getFormContainerPadraoAppCustom(AppBar appBar, Form form) {
+    return Scaffold(
+        backgroundColor: Util.backColorPadrao,
+        appBar: appBar,
         body: Container(
             margin: new EdgeInsets.all(Util.marginScreenPadrao),
             child: Container(

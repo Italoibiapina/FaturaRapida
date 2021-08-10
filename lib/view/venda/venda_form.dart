@@ -3,8 +3,10 @@ import 'package:pedido_facil/models/cliente.dart';
 import 'package:pedido_facil/models/venda.dart';
 import 'package:pedido_facil/provider/cliente_provider.dart';
 import 'package:pedido_facil/provider/crud_provider.dart';
+import 'package:pedido_facil/routes/app_routes.dart';
 import 'package:pedido_facil/util/util.dart';
 import 'package:pedido_facil/util/util_list_tile.dart';
+import 'package:pedido_facil/util/widget/date_picker_widget.dart';
 
 import 'package:provider/provider.dart';
 
@@ -17,7 +19,6 @@ class VendaForm extends StatefulWidget {
 }
 
 class _VendaFormState extends State<VendaForm> {
-  late Venda _newVenda;
   late Venda? venda;
   _VendaFormState({this.venda}) : super();
 
@@ -25,10 +26,15 @@ class _VendaFormState extends State<VendaForm> {
   final _form = GlobalKey<FormState>();
   final Map<String, String> _formData = {};
 
+  rebuildThisForm() {
+    setState(() {
+      //print("Dt Pedido: " + Util.toDateFormat(venda!.dtPed));
+    });
+  }
+
   void _loadFormData() {
     if (venda != null) {
       print("Antes de testar o produto  : " + venda.toString());
-      _newVenda = venda!.clone();
     }
   }
 
@@ -100,9 +106,9 @@ class _VendaFormState extends State<VendaForm> {
           padding: const EdgeInsets.all(Util.marginScreenPadrao),
           children: <Widget>[
             UtilFormVenda.getBlockData(
-              height: 100,
+              height: 90,
               marginTop: false,
-              child: UtilFormVenda.getResumoPedido(venda!),
+              child: UtilFormVenda.getResumoPedido(venda!, context, rebuildThisForm),
             ),
             UtilFormVenda.getBlockData(
               height: 45,
@@ -120,101 +126,75 @@ class _VendaFormState extends State<VendaForm> {
               ),
             ),
             UtilFormVenda.getBlockDataClean(
-              UtilFormVenda.getSecaoDescFretePagto(),
+              UtilFormVenda.getSecaoDescFretePagto(venda!, context, rebuildThisForm),
             ),
             UtilFormVenda.getBlockDataClean(
               UtilFormVenda.getSecaoSigObs(),
             ),
           ],
         ));
-
-    /* return UtilForm.getFormContainerPadrao(
-        'Venda',
-        () => save(),
-        null,
-        Form(
-          key: _form,
-          child: Column(
-            children: <Widget>[
-              TextFormField(
-                initialValue: _formData['nm'],
-                decoration: InputDecoration(labelText: 'Nome'),
-                validator: (value) {
-                  return UtilForm.valTextFormField(valor: value.toString(), mandatorio: true);
-                },
-                onSaved: (value) => _formData['nm'] = value!,
-              ),
-              TextFormField(
-                initialValue: _formData['fone'],
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(labelText: 'Fone'),
-                validator: (value) {
-                  return UtilForm.valTextFormField(
-                      valor: value.toString(), mandatorio: true, numerico: true);
-                },
-                onSaved: (value) => _formData['fone'] = value!,
-              ),
-              TextFormField(
-                initialValue: _formData['email'],
-                decoration: InputDecoration(labelText: 'e-mail'),
-                onSaved: (value) => _formData['email'] = value!,
-              ),
-            ],
-          ),
-        )); */
   }
 }
 
 class UtilFormVenda {
-  static Column getResumoPedido(Venda venda) {
-    return Column(
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(venda.nrPed, style: TextStyle(fontSize: 23, fontWeight: FontWeight.bold)),
-            /* Row(
-              children: [
-                Text("Pagamento:", style: TextStyle(color: Colors.orange)),
-                Text(venda.statusPagto, style: TextStyle(color: Colors.orange)),
-              ],
-            ), */
-            Chip(
-              label:
-                  Text("Pagamento: " + venda.statusPagto, style: TextStyle(color: Colors.orange)),
-              backgroundColor: Colors.white,
-              shape: StadiumBorder(
-                  side: BorderSide(
-                width: 1,
-                color: Colors.orange,
-              )),
-            )
-          ],
-        ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(Util.toDateFormat(venda.dtPed), style: TextStyle(color: Colors.grey)),
-            Chip(
-              label:
-                  Text("Entrega: " + venda.statusEntrega, style: TextStyle(color: Colors.orange)),
-              backgroundColor: Colors.white,
-              shape: StadiumBorder(
-                  side: BorderSide(
-                width: 1,
-                color: Colors.orange,
-              )),
-            )
-            /* Row(
-              children: [
-                Text("Entrega:", style: TextStyle(color: Colors.orange)),
-                Text(venda.statusEntrega, style: TextStyle(color: Colors.orange)),
-              ],
-            ),*/
-            //Text(venda.dtVencPed.toString(), style: TextStyle(color: Colors.grey)),
-          ],
-        ),
-      ],
+  static Container getResumoPedido(Venda venda, context, Function rebuild) {
+    return Container(
+      margin: EdgeInsets.only(top: 5),
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              InkWell(
+                  child: Text(venda.nrPed,
+                      style: TextStyle(fontSize: 23, fontWeight: FontWeight.bold)),
+                  onTap: () async {
+                    await Navigator.of(context)
+                        .pushNamed(AppRoutes.VENDA_FORM_CABECALHO, arguments: venda);
+                    rebuild();
+                  }),
+              getStatusResumo("Pagamento: " + venda.statusPagto, Colors.orange, false, venda),
+            ],
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              DatePickerWidget(
+                iniDate: venda.dtPed,
+                setDateFnc: (pickedDate) => {venda.dtPed = pickedDate},
+              ),
+              //Text(Util.toDateFormat(venda.dtPed), style: TextStyle(color: Colors.grey)),
+              //getStatusResumo("Entrega: " + venda.statusEntrega, Colors.orange, true, venda),
+              getStatusResumo("Entrega: " + venda.statusEntrega, Colors.orange, true, venda),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  static Widget getStatusResumo(String texto, Color cor, bool isShrink, Venda venda) {
+    return Container(
+      margin: EdgeInsets.only(top: 5, bottom: 5),
+      child: SizedBox(
+          height: 30,
+          child: OutlinedButton(
+              onPressed: () => {print("Dt Entrega : " + Util.toDateFormat(venda.dtPed))},
+              child: Row(
+                children: [
+                  /* InkWell(
+                      child: Text(texto, style: TextStyle(color: cor), textAlign: TextAlign.right),
+                      onTap: () {
+                        print("Data de Venda: " + Util.toDateFormat(venda.dtPed));
+                      }), */
+                  Text(texto, style: TextStyle(color: cor), textAlign: TextAlign.right),
+                  Icon(Icons.navigate_next, color: cor),
+                ],
+              ),
+              style: OutlinedButton.styleFrom(
+                  side: BorderSide(color: cor, width: 1),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5.0)),
+                  padding: EdgeInsets.only(left: 8, right: 2, top: 0, bottom: 0)))),
     );
   }
 
@@ -239,6 +219,7 @@ class UtilFormVenda {
     return venda != null
         ? Container(
             child: ListView.builder(
+              physics: NeverScrollableScrollPhysics(), // sem scroll na lista view
               shrinkWrap: true, //para expandir o widget Pai
               itemCount: venda.itens.length,
               itemBuilder: (context, index) {
@@ -277,29 +258,43 @@ class UtilFormVenda {
         : Container(height: 40, child: const Center(child: Text('Pedido sem itens')));
   }
 
-  static Column getSecaoDescFretePagto() {
+  static Column getSecaoDescFretePagto(Venda venda, context, Function rebuild) {
     return Column(
       children: [
-        Container(
-          padding: EdgeInsets.all(Util.contentPaddingPadrao),
-          child: Row(
-            children: [
-              Icon(Icons.money_off, color: Colors.grey), //size: 30.0
-              Container(child: Text("Desconto"), padding: EdgeInsets.only(left: 10)),
-              new Spacer(), // I just added one line
-              Text(Util.toCurency(0)) // This Icon
-            ],
+        InkWell(
+          onTap: () async {
+            await Navigator.of(context)
+                .pushNamed(AppRoutes.VENDA_FORM_DESC_FRETE, arguments: venda);
+            rebuild();
+          },
+          child: Container(
+            padding: EdgeInsets.all(Util.contentPaddingPadrao),
+            child: Row(
+              children: [
+                Icon(Icons.money_off, color: Colors.grey), //size: 30.0
+                Container(child: Text("Desconto"), padding: EdgeInsets.only(left: 10)),
+                new Spacer(), // I just added one line
+                Text(Util.toCurency(venda.vlDesconto)) // This Icon
+              ],
+            ),
           ),
         ),
-        Container(
-          padding: EdgeInsets.all(Util.contentPaddingPadrao),
-          child: Row(
-            children: [
-              Icon(Icons.local_shipping, color: Colors.grey), //size: 30.0
-              Container(child: Text("Frete"), padding: EdgeInsets.only(left: 10)),
-              new Spacer(), // I just added one line
-              Text(Util.toCurency(0)) // This Icon
-            ],
+        InkWell(
+          onTap: () async {
+            await Navigator.of(context)
+                .pushNamed(AppRoutes.VENDA_FORM_DESC_FRETE, arguments: venda);
+            rebuild();
+          },
+          child: Container(
+            padding: EdgeInsets.all(Util.contentPaddingPadrao),
+            child: Row(
+              children: [
+                Icon(Icons.local_shipping, color: Colors.grey), //size: 30.0
+                Container(child: Text("Frete"), padding: EdgeInsets.only(left: 10)),
+                new Spacer(), // I just added one line
+                Text(Util.toCurency(venda.vlFrete)) // This Icon
+              ],
+            ),
           ),
         ),
         Container(

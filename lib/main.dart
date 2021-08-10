@@ -14,7 +14,9 @@ import 'package:pedido_facil/view/cliente/cliente_list.dart';
 import 'package:pedido_facil/view/inicio/inicio.dart';
 import 'package:pedido_facil/view/produto/produto_form.dart';
 import 'package:pedido_facil/view/produto/produto_list.dart';
+import 'package:pedido_facil/view/venda/venda_form_cabecalho.dart';
 import 'package:pedido_facil/view/venda/venda_form.dart';
+import 'package:pedido_facil/view/venda/venda_form_desc_frete.dart';
 import 'package:pedido_facil/view/venda/venda_list.dart';
 import 'package:provider/provider.dart';
 
@@ -72,6 +74,8 @@ class _PedidoFacil extends State<PedidoFacil> {
           AppRoutes.CLIENTE_FORM: (context) => ClienteForm(),
           AppRoutes.VENDA_LIST: (context) => VendaList(),
           AppRoutes.VENDA_FORM: (context) => VendaForm(),
+          AppRoutes.VENDA_FORM_CABECALHO: (context) => VendaFormCabelcalho(),
+          AppRoutes.VENDA_FORM_DESC_FRETE: (context) => VendaFormDescFrete(),
         },
         home: Scaffold(
           backgroundColor: Util.backColorPadrao,

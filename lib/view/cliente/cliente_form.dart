@@ -41,7 +41,7 @@ class _ClienteFormState extends State<ClienteForm> {
   save() {
     final bool isValid = _form.currentState!.validate();
     if (isValid) {
-      _form.currentState!.save();
+      _form.currentState!.save(); // Chama o metodos save de cada um do campos (TextFormField)
 
       final cli = Cliente(
         id: _formData["id"].toString(),
@@ -94,25 +94,36 @@ class _ClienteFormState extends State<ClienteForm> {
             children: <Widget>[
               TextFormField(
                 initialValue: _formData['nm'],
-                decoration: InputDecoration(labelText: 'Nome'),
+                decoration: InputDecoration(
+                    labelText: 'Nome' /* , fillColor: Util.backColorPadrao, filled: true */),
                 validator: (value) {
                   return UtilForm.valTextFormField(valor: value.toString(), mandatorio: true);
                 },
                 onSaved: (value) => _formData['nm'] = value!,
               ),
-              TextFormField(
-                initialValue: _formData['fone'],
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(labelText: 'Fone'),
-                validator: (value) {
-                  return UtilForm.valTextFormField(
-                      valor: value.toString(), mandatorio: true, numerico: true);
-                },
-                onSaved: (value) => _formData['fone'] = value!,
+              Container(
+                //margin: new EdgeInsets.only(top: 15.0, bottom: 15.0),
+                child: TextFormField(
+                  initialValue: _formData['fone'],
+                  keyboardType: TextInputType.number,
+                  decoration: InputDecoration(
+                    //contentPadding: EdgeInsets.only(left: 12, top: 10, bottom: 5),
+                    labelText: 'Fone',
+                    //fillColor: Util.backColorPadrao,
+                    //filled: true,
+                    //labelStyle: TextStyle(color: Colors.lightBlue[600]),
+                  ),
+                  validator: (value) {
+                    return UtilForm.valTextFormField(
+                        valor: value.toString(), mandatorio: true, numerico: true);
+                  },
+                  onSaved: (value) => _formData['fone'] = value!,
+                ),
               ),
               TextFormField(
                 initialValue: _formData['email'],
-                decoration: InputDecoration(labelText: 'e-mail'),
+                decoration: InputDecoration(
+                    labelText: 'e-mail' /* , fillColor: Util.backColorPadrao, filled: true */),
                 onSaved: (value) => _formData['email'] = value!,
               ),
             ],

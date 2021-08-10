@@ -6,4 +6,6 @@ class AppRoutes {
   static const CLIENTE_FORM = '/cliente-form';
   static const VENDA_LIST = '/venda-list';
   static const VENDA_FORM = '/venda-form';
+  static const VENDA_FORM_CABECALHO = '/venda-form-cabecalho';
+  static const VENDA_FORM_DESC_FRETE = '/venda-form-desc-frete';
 }
