@@ -3,6 +3,7 @@ import 'package:pedido_facil/models/produto.dart';
 import 'package:pedido_facil/provider/produto_provider.dart';
 import 'package:pedido_facil/routes/app_routes.dart';
 import 'package:pedido_facil/util/util.dart';
+import 'package:pedido_facil/util/util_form.dart';
 import 'package:pedido_facil/util/util_list_tile.dart';
 import 'package:provider/provider.dart';
 
@@ -64,32 +65,43 @@ class ProdutoTile extends StatelessWidget {
                   },
                   color: Colors.orangeAccent),
               IconButton(
-                  icon: Icon(Icons.delete),
-                  onPressed: () {
-                    showDialog(
-                      context: context,
-                      builder: (ctx) => AlertDialog(
-                        title: Text("Excluir Usuário"),
-                        content: Text("Tem certeza que gostaria de excluir?"),
-                        actions: <Widget>[
-                          TextButton(
-                            child: Text("Não"),
-                            onPressed: () => Navigator.of(context).pop(false),
-                          ),
-                          TextButton(
-                            child: Text("Sim"),
-                            onPressed: () => Navigator.of(context).pop(true),
-                          ),
-                        ],
-                      ),
-                    ).then((confirmed) {
-                      if (confirmed) {
-                        // o provider abaixo não vai ser notificado, mas o provider da lista vai.
-                        Provider.of<ProdutoProvider>(context, listen: false).remove(produto);
-                      }
-                    });
-                  },
-                  color: Colors.redAccent),
+                icon: Icon(Icons.delete),
+                color: Colors.redAccent,
+                onPressed: () {
+                  UtilForm.showDialogSimNao(
+                    context,
+                    "Excluir Usuário",
+                    "Tem certeza que gostaria de excluir?",
+                    () {
+                      // A remoção b'ao vai gerar notificao (redesenhar a lista, por conta do parametro "listen: false"
+                      Provider.of<ProdutoProvider>(context, listen: false).remove(produto);
+                    },
+                    () => {},
+                  );
+                  /* showDialog(
+                    context: context,
+                    builder: (ctx) => AlertDialog(
+                      title: Text("Excluir Usuário"),
+                      content: Text("Tem certeza que gostaria de excluir?"),
+                      actions: <Widget>[
+                        TextButton(
+                          child: Text("Não"),
+                          onPressed: () => Navigator.of(context).pop(false),
+                        ),
+                        TextButton(
+                          child: Text("Sim"),
+                          onPressed: () => Navigator.of(context).pop(true),
+                        ),
+                      ],
+                    ),
+                  ).then((confirmed) {
+                    if (confirmed) {
+                      // A remoção b'ao vai gerar notificao (redesenhar a lista, por conta do parametro "listen: false"
+                      Provider.of<ProdutoProvider>(context, listen: false).remove(produto);
+                    }
+                  });*/
+                },
+              ),
             ],
           ),
         ),

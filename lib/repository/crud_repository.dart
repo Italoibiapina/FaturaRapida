@@ -14,7 +14,8 @@ class CrudLocalStorage extends ICrudRepository {
   Map<String, Object> get allMap => itens;
 
   List<IData> get all {
-    return [...itens.values] as List<IData>;
+    var lst = [...itens.values];
+    return lst as List<IData>;
   }
 
 /*   int get count {

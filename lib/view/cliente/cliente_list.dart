@@ -13,6 +13,9 @@ class ClienteList extends StatelessWidget {
   Widget build(BuildContext context) {
     final ClienteProvider clis = Provider.of(context);
 
+    var args = ModalRoute.of(context)!.settings.arguments;
+    final isSearch = args != null; // se tiver passado algum
+
     return Scaffold(
       backgroundColor: Util.backColorPadrao,
       appBar: AppBar(
@@ -36,7 +39,7 @@ class ClienteList extends StatelessWidget {
 
             index -= 2;
             return Container(
-              child: ClienteTile(cliente: clis.byIndex(index)),
+              child: ClienteTile(cliente: clis.byIndex(index), isSearch: isSearch),
             );
           },
         ),
@@ -47,7 +50,8 @@ class ClienteList extends StatelessWidget {
 
 class ClienteTile extends StatelessWidget {
   final Cliente cliente;
-  const ClienteTile({Key? key, required this.cliente}) : super(key: key);
+  final bool isSearch;
+  const ClienteTile({Key? key, required this.cliente, required this.isSearch}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -56,7 +60,13 @@ class ClienteTile extends StatelessWidget {
       child: ListTile(
         contentPadding: UtilListTile.contentPaddingPadrao,
         visualDensity: UtilListTile.visualDensityPadrao,
-        onTap: () => Navigator.of(context).pushNamed(AppRoutes.CLIENTE_FORM, arguments: cliente),
+        onTap: () {
+          if (isSearch) {
+            Navigator.of(context).pop(cliente);
+          } else {
+            Navigator.of(context).pushNamed(AppRoutes.CLIENTE_FORM, arguments: cliente);
+          }
+        },
         leading: CircleAvatar(
           backgroundColor: Colors.blue,
           foregroundColor: Colors.white,

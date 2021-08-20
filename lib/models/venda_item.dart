@@ -3,8 +3,8 @@ import 'package:pedido_facil/models/produto.dart';
 import 'IData.dart';
 
 class VendaItem extends IData {
-  final Produto prod;
-  final int qtd;
+  late final Produto prod;
+  late int qtd;
 
   double get vlTot {
     return prod.vlVenda * qtd;
@@ -13,7 +13,7 @@ class VendaItem extends IData {
   VendaItem({
     id,
     required this.prod,
-    required this.qtd,
+    this.qtd = 1,
   }) : super(id: id);
 
   VendaItem clone() {

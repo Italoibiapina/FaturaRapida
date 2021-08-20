@@ -12,8 +12,10 @@ class UtilForm {
     List<String> lstErros = [];
 
     var vRet;
-    vRet = UtilForm._valMandatorio(valor);
-    if (vRet != null) lstErros.add(vRet);
+    if (mandatorio == true) {
+      vRet = UtilForm._valMandatorio(valor);
+      if (vRet != null) lstErros.add(vRet);
+    }
 
     if (numerico == true) {
       if (decimal == true) {
@@ -75,22 +77,6 @@ class UtilForm {
     );
 
     return getFormContainerPadraoAppCustom(appBar, form);
-
-    /* return Scaffold(
-        backgroundColor: Util.backColorPadrao,
-        appBar: AppBar(
-          title: Text(tituloForm),
-          actions: _botoes,
-        ),
-        body: Container(
-            margin: new EdgeInsets.all(Util.marginScreenPadrao),
-            child: Container(
-              padding: EdgeInsets.all(Util.paddingFormPadrao),
-              decoration: new BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: new BorderRadius.circular(Util.borderRadiousPadrao)),
-              child: form,
-            ))); */
   }
 
   static Scaffold getFormContainerPadraoAppCustom(AppBar appBar, Form form) {
@@ -106,5 +92,60 @@ class UtilForm {
                   borderRadius: new BorderRadius.circular(Util.borderRadiousPadrao)),
               child: form,
             )));
+  }
+
+  static showDialogSimNao(
+      context, String titulo, String msg, Function fncConf, Function fncNaoConf) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(titulo),
+        content: Text(msg),
+        actions: <Widget>[
+          TextButton(
+            child: Text("Não"),
+            onPressed: () => Navigator.of(context).pop(false),
+          ),
+          TextButton(
+            child: Text("Sim"),
+            onPressed: () => Navigator.of(context).pop(true),
+          ),
+        ],
+      ),
+    ).then((confirmed) {
+      if (confirmed) {
+        // o provider abaixo não vai ser notificado, mas o provider da lista vai.
+        //Provider.of<ClienteProvider>(context, listen: false).remove(regUpd);
+        //provider.remove(regUpd);
+        fncConf();
+      } else
+        fncNaoConf();
+    });
+  }
+
+  static showDialogEditarDescartar(context, String titulo, String msg, Function fncDescartar) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(titulo),
+        content: Text(msg),
+        actions: <Widget>[
+          TextButton(
+            child: Text("Descartar"),
+            onPressed: () async {
+              Navigator.of(context).pop(true); // fecha pop de pergunta
+            },
+          ),
+          TextButton(
+            child: Text("Editar"),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+        ],
+      ),
+    ).then((confirmed) async {
+      if (confirmed) {
+        await fncDescartar();
+      }
+    });
   }
 }

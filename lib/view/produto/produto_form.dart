@@ -56,7 +56,7 @@ class _ProdutoFormState extends State<ProdutoForm> {
   @override
   Widget build(BuildContext context) {
     return UtilForm.getFormContainerPadrao(
-        'Cliente',
+        'Produto',
         () => save(),
         null,
         Form(

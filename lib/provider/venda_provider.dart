@@ -1,3 +1,4 @@
+import 'package:pedido_facil/models/cliente.dart';
 import 'package:pedido_facil/models/venda.dart';
 import 'package:pedido_facil/repository/i_crud_repository.dart';
 
@@ -39,5 +40,13 @@ class VendaProvider extends CrudProvider {
 
   Venda byIndex(int i) {
     return itens.values.elementAt(i) as Venda;
+  }
+
+  List byCliente(Cliente cliente, Venda vendaDesconsiderar) {
+    var vendasCli = itens.values.where((element) {
+      var vVenda = element as Venda;
+      return vendaDesconsiderar.nrPed != vVenda.nrPed && vVenda.cli.id == cliente.id;
+    }).toList();
+    return vendasCli;
   }
 }

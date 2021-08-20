@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pedido_facil/models/cliente.dart';
 import 'package:pedido_facil/models/venda.dart';
+import 'package:pedido_facil/models/venda_item.dart';
 import 'package:pedido_facil/provider/cliente_provider.dart';
 import 'package:pedido_facil/provider/crud_provider.dart';
 import 'package:pedido_facil/routes/app_routes.dart';
@@ -111,15 +112,13 @@ class _VendaFormState extends State<VendaForm> {
               child: UtilFormVenda.getResumoPedido(venda!, context, rebuildThisForm),
             ),
             UtilFormVenda.getBlockData(
-              height: 45,
-              child: UtilFormVenda.getSecaoCliente(venda),
-            ),
+                height: 45, child: UtilFormVenda.getSecaoCliente(venda!, context, rebuildThisForm)),
             //UtilFormVenda.getBlockDataClean(UtilFormVenda.getListVendaItens(venda)),
             UtilFormVenda.getBlockDataClean(
               Column(
                 children: [
-                  UtilFormVenda.getBarrasAcoes("Adicionar Item", ""),
-                  UtilFormVenda.getListVendaItens(venda),
+                  UtilFormVenda.getBarraAddItem(context, venda, rebuildThisForm),
+                  UtilFormVenda.getListVendaItens(venda!, rebuildThisForm),
                   UtilFormVenda.getBarrasSumarizadora(
                       "Subtotal", Util.toCurency(0), Colors.grey.shade400, Colors.white),
                 ],
@@ -146,13 +145,14 @@ class UtilFormVenda {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               InkWell(
-                  child: Text(venda.nrPed,
-                      style: TextStyle(fontSize: 23, fontWeight: FontWeight.bold)),
-                  onTap: () async {
-                    await Navigator.of(context)
-                        .pushNamed(AppRoutes.VENDA_FORM_CABECALHO, arguments: venda);
-                    rebuild();
-                  }),
+                child:
+                    Text(venda.nrPed, style: TextStyle(fontSize: 23, fontWeight: FontWeight.bold)),
+                onTap: () async {
+                  await Navigator.of(context)
+                      .pushNamed(AppRoutes.VENDA_FORM_CABECALHO, arguments: venda);
+                  rebuild();
+                },
+              ),
               getStatusResumo("Pagamento: " + venda.statusPagto, Colors.orange, false, venda),
             ],
           ),
@@ -198,25 +198,69 @@ class UtilFormVenda {
     );
   }
 
-  static Row getSecaoCliente(venda) {
-    return Row(
-      children: [
-        Icon(Icons.people, color: Colors.grey), //size: 30.0
-        Container(
-          child: Text("Cliente:"),
-          padding: EdgeInsets.only(left: 10, right: 5),
-        ),
-        Text(venda!.cli == null ? "Informe o cliente" : venda!.cli.nm),
-        new Spacer(), // I just added one line
-        Icon(Icons.navigate_next, color: Colors.black) // This Icon
-      ],
+  static InkWell getSecaoCliente(Venda venda, context, Function rebuild) {
+    return InkWell(
+      child: Row(
+        children: [
+          Icon(Icons.people, color: Colors.grey), //size: 30.0
+          Container(
+            child: Text("Cliente:"),
+            padding: EdgeInsets.only(left: 10, right: 5),
+          ),
+          Text(venda.cli == null ? "Informe o cliente" : venda.cli.nm),
+          new Spacer(), // I just added one line
+          Icon(Icons.navigate_next, color: Colors.black) // This Icon
+        ],
+      ),
+      onTap: () async {
+        await Navigator.of(context)
+            .pushNamed(AppRoutes.CLIENTE_LIST, arguments: venda)
+            .then((object) {
+          if (object != null) {
+            Cliente cliente = object as Cliente;
+            venda.cli = cliente;
+          }
+        });
+        rebuild();
+      },
     );
   }
 
   static final _containerHeightButton = 30.0;
 
-  static Widget getListVendaItens(Venda? venda) {
-    return venda != null
+  static Container getBarraAddItem(context, venda, rebuildForm) {
+    ButtonStyle _btStyle = TextButton.styleFrom(
+      padding: const EdgeInsets.only(
+          left: Util.contentPaddingPadrao, right: Util.contentPaddingPadrao, top: 0.0, bottom: 0.0),
+    );
+    return Container(
+      height: 30,
+      decoration: BoxDecoration(
+          border: Border(
+        bottom: BorderSide(width: 1.0, color: Colors.grey.shade200),
+      )),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Container(
+              height: _containerHeightButton,
+              child: TextButton(
+                style: _btStyle,
+                onPressed: () async {
+                  await Navigator.of(context).pushNamed(AppRoutes.VENDA_FORM_ITEM).then((object) {
+                    if (object != null) venda!.itens.add(object as VendaItem);
+                  });
+                  rebuildForm();
+                },
+                child: Text('Adicionar Item', style: TextStyle(color: Colors.green)),
+              )),
+        ],
+      ),
+    );
+  }
+
+  static Widget getListVendaItens(Venda venda, rebuildForm) {
+    return venda.itens.length > 0
         ? Container(
             child: ListView.builder(
               physics: NeverScrollableScrollPhysics(), // sem scroll na lista view
@@ -225,31 +269,63 @@ class UtilFormVenda {
               itemBuilder: (context, index) {
                 final item = venda.itens.elementAt(index);
 
-                return Container(
-                  decoration: UtilListTile.boxDecorationPadrao,
-                  padding: EdgeInsets.all(Util.contentPaddingPadrao),
-                  child: Column(
-                    children: [
-                      Container(
-                        margin: EdgeInsets.only(bottom: 5),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(item.prod.nm),
-                            Text(Util.toCurency(item.vlTot)),
-                          ],
-                        ),
-                      ),
-                      Row(
+                return InkWell(
+                  onTap: () async {
+                    await Navigator.of(context)
+                        .pushNamed(AppRoutes.VENDA_FORM_ITEM, arguments: item)
+                        .then((object) {
+                      if (object == null) venda.removeItemVenda(item);
+                    });
+                    rebuildForm();
+                  },
+                  child: Container(
+                    decoration: UtilListTile.boxDecorationPadrao,
+                    padding: EdgeInsets.all(Util.contentPaddingPadrao),
+                    child:
+                        /* ListTile(
+                      visualDensity: VisualDensity(horizontal: 0, vertical: -3),
+                      //mainAxisAlignment: MainAxisAlignment.spaceBetween,
+
+                      title: Text(item.prod.nm),
+
+                      trailing: Column(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
+                          Text(Util.toCurency(item.vlTot)),
                           Text(
-                            item.qtd.toString() + ' x ' + Util.toCurency(item.prod.vlVenda),
+                            '' + item.qtd.toString() + ' x ' + Util.toCurency(item.prod.vlVenda),
                             style: TextStyle(color: Colors.grey),
                           ),
                         ],
                       ),
-                    ],
+                    ), */
+                        Column(
+                      children: [
+                        Container(
+                          margin: EdgeInsets.only(bottom: 5),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Flexible(
+                                  child: Text(
+                                item.prod.nm,
+                                overflow: TextOverflow.ellipsis,
+                              )),
+                              Text(Util.toCurency(item.vlTot)),
+                            ],
+                          ),
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            Text(
+                              item.qtd.toString() + ' x ' + Util.toCurency(item.prod.vlVenda),
+                              style: TextStyle(color: Colors.grey),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                 );
               },
@@ -374,39 +450,6 @@ class UtilFormVenda {
         borderRadius: new BorderRadius.all(const Radius.circular(Util.borderRadiousPadrao)),
       ),
       child: child,
-    );
-  }
-
-  static Container getBarrasAcoes(labelEsq, labelDir /* , bool islbEsqButton */) {
-    ButtonStyle _btStyle = TextButton.styleFrom(
-      padding: const EdgeInsets.only(
-          left: Util.contentPaddingPadrao, right: Util.contentPaddingPadrao, top: 0.0, bottom: 0.0),
-    );
-    return Container(
-      height: 30,
-      decoration: BoxDecoration(
-          border: Border(
-        bottom: BorderSide(width: 1.0, color: Colors.grey.shade200),
-      )),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Container(
-              height: _containerHeightButton,
-              child: TextButton(
-                style: _btStyle,
-                onPressed: () => {},
-                child: Text(labelEsq, style: TextStyle(color: Colors.green)),
-              )),
-          Container(
-              height: _containerHeightButton,
-              //padding: EdgeInsets.only(right: 5.0),
-              child: TextButton(
-                  style: _btStyle,
-                  onPressed: () => {},
-                  child: Text(labelDir, style: TextStyle(color: Colors.green)))),
-        ],
-      ),
     );
   }
 

@@ -17,6 +17,8 @@ final Dummy_vendas = {
         VendaItem(id: '1', prod: prods.values.elementAt(1), qtd: 2),
         VendaItem(id: '2', prod: prods.values.elementAt(2), qtd: 1)
       ],
+      vlDesconto: 10,
+      vlFrete: 15,
       isPago: true,
       isEnt: true),
   '2': Venda(
@@ -39,6 +41,8 @@ final Dummy_vendas = {
         VendaItem(id: '5', prod: prods.values.elementAt(1), qtd: 1),
         VendaItem(id: '6', prod: prods.values.elementAt(2), qtd: 1)
       ],
+      vlDesconto: 20,
+      vlFrete: 25,
       isPago: true,
       isEnt: false),
   '4': Venda(
@@ -50,6 +54,35 @@ final Dummy_vendas = {
         VendaItem(id: '7', prod: prods.values.elementAt(1), qtd: 2),
         VendaItem(id: '8', prod: prods.values.elementAt(2), qtd: 2)
       ],
+      vlDesconto: 10,
+      vlFrete: 35,
+      dsEnd: 'Rua dos Bobos , 0, Sao Bernardo do Campo, SP, Brazil',
+      isPago: false,
+      isEnt: false),
+  '5': Venda(
+      id: '5',
+      nrPed: 'PED005',
+      dtPed: DateTime.now(),
+      cli: clis.values.elementAt(2),
+      itens: [
+        VendaItem(id: '7', prod: prods.values.elementAt(1), qtd: 2),
+        VendaItem(id: '8', prod: prods.values.elementAt(2), qtd: 2)
+      ],
+      vlDesconto: 10,
+      vlFrete: 15,
+      isPago: false,
+      isEnt: false),
+  '6': Venda(
+      id: '6',
+      nrPed: 'PED006',
+      dtPed: DateTime.now(),
+      cli: clis.values.elementAt(2),
+      itens: [
+        VendaItem(id: '7', prod: prods.values.elementAt(1), qtd: 2),
+        VendaItem(id: '8', prod: prods.values.elementAt(2), qtd: 2)
+      ],
+      vlDesconto: 10,
+      vlFrete: 15,
       isPago: false,
       isEnt: false),
 };

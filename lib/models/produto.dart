@@ -5,8 +5,8 @@ import 'IData.dart';
 
 class Produto extends IData {
   //final String id;
-  final String nm;
-  final double vlVenda;
+  late String nm;
+  late double vlVenda;
   final double vlCusto;
   final int? diasConsumo;
   final String detalhe;

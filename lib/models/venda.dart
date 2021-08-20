@@ -7,10 +7,11 @@ class Venda extends IData {
   late String nrPed;
   late DateTime dtPed;
   final DateTime? dtVencPed;
-  final Cliente cli;
-  final List<VendaItem> itens;
+  late Cliente cli;
+  List<VendaItem> itens;
   double vlDesconto;
   double vlFrete;
+  String dsEnd;
   final bool isPago;
   final bool isEnt;
 
@@ -53,7 +54,8 @@ class Venda extends IData {
       required this.isPago,
       required this.isEnt,
       this.vlDesconto = 0.0,
-      this.vlFrete = 0.0})
+      this.vlFrete = 0.0,
+      this.dsEnd = ''})
       : super(id: id);
 
   Venda clone() {
@@ -66,5 +68,9 @@ class Venda extends IData {
         itens: itens,
         isPago: isPago,
         isEnt: isEnt);
+  }
+
+  removeItemVenda(VendaItem vendaItem) {
+    itens = itens.where((i) => i.id != vendaItem.id).toList();
   }
 }
