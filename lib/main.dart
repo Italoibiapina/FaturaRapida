@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:pedido_facil/data/dummy_vendas.dart';
 import 'package:pedido_facil/models/venda.dart';
 import 'package:pedido_facil/provider/cliente_provider.dart';
+import 'package:pedido_facil/provider/meio_pgto_provider.dart';
 import 'package:pedido_facil/provider/produto_provider.dart';
 import 'package:pedido_facil/provider/venda_provider.dart';
 import 'package:pedido_facil/repository/cliente_repository.dart';
+import 'package:pedido_facil/repository/meio_pagto_repository.dart';
 import 'package:pedido_facil/repository/produto_repository.dart';
 import 'package:pedido_facil/repository/venda_repository.dart';
 import 'package:pedido_facil/routes/app_routes.dart';
@@ -18,7 +20,9 @@ import 'package:pedido_facil/view/venda/venda_form_cabecalho.dart';
 import 'package:pedido_facil/view/venda/venda_form.dart';
 import 'package:pedido_facil/view/venda/venda_form_desc_frete.dart';
 import 'package:pedido_facil/view/venda/venda_form_item.dart';
+import 'package:pedido_facil/view/venda/venda_form_pagamento.dart';
 import 'package:pedido_facil/view/venda/venda_list.dart';
+import 'package:pedido_facil/view/venda/venda_list_pagamentos.dart';
 import 'package:provider/provider.dart';
 
 void main() {
@@ -60,7 +64,8 @@ class _PedidoFacil extends State<PedidoFacil> {
       providers: [
         ChangeNotifierProvider(create: (ctx) => ProdutoProvider(ProdutoRepository())),
         ChangeNotifierProvider(create: (ctx) => ClienteProvider(ClienteRepository())),
-        ChangeNotifierProvider(create: (ctx) => VendaProvider(VendaRepository()))
+        ChangeNotifierProvider(create: (ctx) => VendaProvider(VendaRepository())),
+        ChangeNotifierProvider(create: (ctx) => MeioPagamentoProvider(MeioPagamentoRepository()))
       ],
       child: MaterialApp(
         title: 'Flutter Demo',
@@ -78,6 +83,8 @@ class _PedidoFacil extends State<PedidoFacil> {
           AppRoutes.VENDA_FORM_CABECALHO: (context) => VendaFormCabelcalho(),
           AppRoutes.VENDA_FORM_DESC_FRETE: (context) => VendaFormDescFrete(),
           AppRoutes.VENDA_FORM_ITEM: (context) => VendaFormItem(),
+          AppRoutes.VENDA_LIST_PAGTO: (context) => VendaListPagamentos(),
+          AppRoutes.VENDA_FORM_PAGTO: (context) => VendaFormPagamento(),
         },
         home: Scaffold(
           backgroundColor: Util.backColorPadrao,

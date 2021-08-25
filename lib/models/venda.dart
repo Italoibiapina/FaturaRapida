@@ -1,5 +1,6 @@
 import 'package:pedido_facil/models/cliente.dart';
 import 'package:pedido_facil/models/venda_item.dart';
+import 'package:pedido_facil/models/venda_pagamento.dart';
 
 import 'IData.dart';
 
@@ -9,14 +10,51 @@ class Venda extends IData {
   final DateTime? dtVencPed;
   late Cliente cli;
   List<VendaItem> itens;
+  List<VendaPagamento> pagtos;
   double vlDesconto;
   double vlFrete;
   String dsEnd;
   final bool isPago;
   final bool isEnt;
 
-  double get vlTotPed {
-    return 0.0;
+  Venda(
+      {id,
+      required this.nrPed,
+      required this.dtPed,
+      this.dtVencPed,
+      required this.cli,
+      required this.itens,
+      required this.isPago,
+      required this.isEnt,
+      required this.pagtos,
+      this.vlDesconto = 0.0,
+      this.vlFrete = 0.0,
+      this.dsEnd = ''})
+      : super(id: id);
+
+  Venda clone() {
+    return Venda(
+        id: id,
+        nrPed: nrPed,
+        dtPed: dtPed,
+        dtVencPed: dtVencPed,
+        cli: cli,
+        itens: itens,
+        pagtos: pagtos,
+        isPago: isPago,
+        isEnt: isEnt);
+  }
+
+  double get vlTotItens {
+    return this.itens.fold(0, (sum, VendaItem item) => sum + item.vlTot);
+  }
+
+  double get vlTotPg {
+    return this.pagtos.fold(0, (sum, VendaPagamento pgto) => sum + pgto.vlPgto);
+  }
+
+  double get vlTotGeral {
+    return (vlTotItens + vlFrete) - (vlDesconto + vlTotPg);
   }
 
   String get statusPagto {
@@ -44,33 +82,11 @@ class Venda extends IData {
     return "";
   }
 
-  Venda(
-      {id,
-      required this.nrPed,
-      required this.dtPed,
-      this.dtVencPed,
-      required this.cli,
-      required this.itens,
-      required this.isPago,
-      required this.isEnt,
-      this.vlDesconto = 0.0,
-      this.vlFrete = 0.0,
-      this.dsEnd = ''})
-      : super(id: id);
-
-  Venda clone() {
-    return Venda(
-        id: id,
-        nrPed: nrPed,
-        dtPed: dtPed,
-        dtVencPed: dtVencPed,
-        cli: cli,
-        itens: itens,
-        isPago: isPago,
-        isEnt: isEnt);
-  }
-
   removeItemVenda(VendaItem vendaItem) {
     itens = itens.where((i) => i.id != vendaItem.id).toList();
+  }
+
+  removePagtoVenda(VendaPagamento vendaPgto) {
+    pagtos = pagtos.where((i) => i.id != vendaPgto.id).toList();
   }
 }

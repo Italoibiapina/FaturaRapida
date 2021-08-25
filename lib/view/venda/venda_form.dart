@@ -119,8 +119,8 @@ class _VendaFormState extends State<VendaForm> {
                 children: [
                   UtilFormVenda.getBarraAddItem(context, venda, rebuildThisForm),
                   UtilFormVenda.getListVendaItens(venda!, rebuildThisForm),
-                  UtilFormVenda.getBarrasSumarizadora(
-                      "Subtotal", Util.toCurency(0), Colors.grey.shade400, Colors.white),
+                  UtilFormVenda.getBarrasSumarizadora("Subtotal", Util.toCurency(venda!.vlTotItens),
+                      Colors.grey.shade400, Colors.white),
                 ],
               ),
             ),
@@ -153,7 +153,8 @@ class UtilFormVenda {
                   rebuild();
                 },
               ),
-              getStatusResumo("Pagamento: " + venda.statusPagto, Colors.orange, false, venda),
+              getStatusResumo(
+                  context, "Pagamento: " + venda.statusPagto, Colors.orange, false, venda, rebuild),
             ],
           ),
           Row(
@@ -165,7 +166,8 @@ class UtilFormVenda {
               ),
               //Text(Util.toDateFormat(venda.dtPed), style: TextStyle(color: Colors.grey)),
               //getStatusResumo("Entrega: " + venda.statusEntrega, Colors.orange, true, venda),
-              getStatusResumo("Entrega: " + venda.statusEntrega, Colors.orange, true, venda),
+              getStatusResumo(
+                  context, "Entrega: " + venda.statusEntrega, Colors.orange, true, venda, rebuild),
             ],
           ),
         ],
@@ -173,13 +175,19 @@ class UtilFormVenda {
     );
   }
 
-  static Widget getStatusResumo(String texto, Color cor, bool isShrink, Venda venda) {
+  static Widget getStatusResumo(
+      context, String texto, Color cor, bool isShrink, Venda venda, Function rebuild) {
     return Container(
       margin: EdgeInsets.only(top: 5, bottom: 5),
       child: SizedBox(
           height: 30,
           child: OutlinedButton(
-              onPressed: () => {print("Dt Entrega : " + Util.toDateFormat(venda.dtPed))},
+              onPressed: () => {
+                    Navigator.of(context)
+                        .pushNamed(AppRoutes.VENDA_LIST_PAGTO, arguments: venda)
+                        .then((value) => rebuild())
+                    /* print("Dt Entrega : " + Util.toDateFormat(venda.dtPed)) */
+                  },
               child: Row(
                 children: [
                   /* InkWell(
@@ -207,6 +215,7 @@ class UtilFormVenda {
             child: Text("Cliente:"),
             padding: EdgeInsets.only(left: 10, right: 5),
           ),
+          // ignore: unnecessary_null_comparison
           Text(venda.cli == null ? "Informe o cliente" : venda.cli.nm),
           new Spacer(), // I just added one line
           Icon(Icons.navigate_next, color: Colors.black) // This Icon
@@ -380,12 +389,12 @@ class UtilFormVenda {
               Icon(Icons.payments, color: Colors.grey), //size: 30.0
               Container(child: Text("Pagamentos"), padding: EdgeInsets.only(left: 10)),
               new Spacer(), // I just added one line
-              Text(Util.toCurency(0)) // This Icon
+              Text(Util.toCurency(venda.vlTotPg)) // This Icon
             ],
           ),
         ),
         UtilFormVenda.getBarrasSumarizadora(
-            "Total Geral", Util.toCurency(0), Colors.grey.shade400, Colors.white),
+            "Total Geral", Util.toCurency(venda.vlTotGeral), Colors.grey.shade400, Colors.white),
       ],
     );
   }

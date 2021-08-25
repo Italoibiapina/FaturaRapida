@@ -123,7 +123,8 @@ class UtilForm {
     });
   }
 
-  static showDialogEditarDescartar(context, String titulo, String msg, Function fncDescartar) {
+  static DateTime? showDialogEditarDescartar(
+      context, String titulo, String msg, Function fncDescartar) {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -147,5 +148,16 @@ class UtilForm {
         await fncDescartar();
       }
     });
+  }
+
+  static showPickupDate(context, DateTime iniVl) async {
+    // Show Date Picker Here
+    final newDate = await showDatePicker(
+      context: context,
+      initialDate: iniVl,
+      firstDate: DateTime(DateTime.now().year - 20),
+      lastDate: DateTime(DateTime.now().year + 20),
+    );
+    return newDate;
   }
 }

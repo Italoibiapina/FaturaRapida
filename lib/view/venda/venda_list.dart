@@ -86,7 +86,7 @@ class VendaTile extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(venda.cli.nm, style: TextStyle(fontWeight: FontWeight.bold)),
-            Text(Util.toCurency(venda.vlTotPed)),
+            Text(Util.toCurency(venda.vlTotItens)),
           ],
         ),
         subtitle: Row(

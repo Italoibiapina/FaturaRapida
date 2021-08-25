@@ -9,4 +9,6 @@ class AppRoutes {
   static const VENDA_FORM_CABECALHO = '/venda-form-cabecalho';
   static const VENDA_FORM_DESC_FRETE = '/venda-form-desc-frete';
   static const VENDA_FORM_ITEM = '/venda-form-item';
+  static const VENDA_LIST_PAGTO = '/venda-list-pagto';
+  static const VENDA_FORM_PAGTO = '/venda-form-pagto';
 }
