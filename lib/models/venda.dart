@@ -3,6 +3,7 @@ import 'package:pedido_facil/models/venda_item.dart';
 import 'package:pedido_facil/models/venda_pagamento.dart';
 
 import 'IData.dart';
+import 'venda_entrega.dart';
 
 class Venda extends IData {
   late String nrPed;
@@ -11,6 +12,7 @@ class Venda extends IData {
   late Cliente cli;
   List<VendaItem> itens;
   List<VendaPagamento> pagtos;
+  List<VendaEntrega> entregas;
   double vlDesconto;
   double vlFrete;
   String dsEnd;
@@ -27,6 +29,7 @@ class Venda extends IData {
       required this.isPago,
       required this.isEnt,
       required this.pagtos,
+      required this.entregas,
       this.vlDesconto = 0.0,
       this.vlFrete = 0.0,
       this.dsEnd = ''})
@@ -41,16 +44,25 @@ class Venda extends IData {
         cli: cli,
         itens: itens,
         pagtos: pagtos,
+        entregas: entregas,
         isPago: isPago,
         isEnt: isEnt);
   }
 
   double get vlTotItens {
-    return this.itens.fold(0, (sum, VendaItem item) => sum + item.vlTot);
+    return this.itens.fold(0, (sum, VendaItem item) => sum + item.vlTot); // sum é o acumulador
   }
 
   double get vlTotPg {
     return this.pagtos.fold(0, (sum, VendaPagamento pgto) => sum + pgto.vlPgto);
+  }
+
+  int get qtdItens {
+    return this.itens.fold(0, (sum, VendaItem item) => sum + item.qtd);
+  }
+
+  int get qtdItensEntregues {
+    return this.entregas.fold(0, (sum, VendaEntrega entrega) => sum + entrega.totItensEntregues);
   }
 
   double get vlTotGeral {
@@ -88,5 +100,9 @@ class Venda extends IData {
 
   removePagtoVenda(VendaPagamento vendaPgto) {
     pagtos = pagtos.where((i) => i.id != vendaPgto.id).toList();
+  }
+
+  removeEntregaVenda(VendaEntrega vendaEntrega) {
+    entregas = entregas.where((i) => i.id != vendaEntrega.id).toList();
   }
 }

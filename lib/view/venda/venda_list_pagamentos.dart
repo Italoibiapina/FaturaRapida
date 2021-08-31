@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pedido_facil/models/util/retorno_form.dart';
 import 'package:pedido_facil/models/venda.dart';
 import 'package:pedido_facil/models/venda_pagamento.dart';
 import 'package:pedido_facil/routes/app_routes.dart';
@@ -54,8 +55,8 @@ class _VendaListPagamentosState extends State<VendaListPagamentos> {
             child: Column(children: [
               _UtilLstaPagtos.getBarraAddItem(context, venda, rebuildThisForm),
               _UtilLstaPagtos.getListaPagtos(venda, rebuildThisForm),
-              _UtilLstaPagtos.getBarrasSumarizadora("Total de Pagamentos",
-                  Util.toCurency(venda.vlTotPg), Colors.grey.shade400, Colors.white),
+              _UtilLstaPagtos.getBarrasSumarizadora(
+                  "Total de Pagamentos", Util.toCurency(venda.vlTotPg), Colors.grey.shade400, Colors.white),
             ]),
           ),
           Container(
@@ -67,11 +68,8 @@ class _VendaListPagamentosState extends State<VendaListPagamentos> {
             child: Column(children: [
               _UtilLstaPagtos.getBarrasAntesSumarizadora(
                   "Total do Pedido", Util.toCurency(venda.vlTotItens), Colors.white, Colors.black),
-              _UtilLstaPagtos.getBarrasSumarizadora(
-                  "Saldo Devedor",
-                  Util.toCurency(venda.vlTotItens - venda.vlTotPg),
-                  Colors.grey.shade400,
-                  Colors.white),
+              _UtilLstaPagtos.getBarrasSumarizadora("Saldo Devedor", Util.toCurency(venda.vlTotItens - venda.vlTotPg),
+                  Colors.grey.shade400, Colors.white),
             ]),
           ),
         ],
@@ -121,6 +119,24 @@ class _VendaListPagamentosState extends State<VendaListPagamentos> {
 } */
 
 class _UtilLstaPagtos {
+  static callNovoRegistro(context, Venda venda, rebuildForm) async {
+    await Navigator.of(context).pushNamed(AppRoutes.VENDA_FORM_PAGTO).then((object) {
+      if (object == null) return;
+      RetornoForm retornoForm = object as RetornoForm;
+      if (!retornoForm.isDelete) venda.pagtos.add(retornoForm.objData as VendaPagamento);
+    });
+    rebuildForm();
+  }
+
+  static callEditRegistro(context, Venda venda, pagto, rebuildForm) async {
+    await Navigator.of(context).pushNamed(AppRoutes.VENDA_FORM_PAGTO, arguments: pagto).then((object) {
+      if (object == null) return;
+      RetornoForm retorno = object as RetornoForm;
+      if (retorno.isDelete) venda.removePagtoVenda(pagto);
+    });
+    rebuildForm();
+  }
+
   static Container getBarraAddItem(context, venda, rebuildForm) {
     ButtonStyle _btStyle = TextButton.styleFrom(
       padding: const EdgeInsets.only(
@@ -140,12 +156,15 @@ class _UtilLstaPagtos {
               height: _containerHeightButton,
               child: TextButton(
                 style: _btStyle,
-                onPressed: () async {
+                onPressed: () => callNovoRegistro(context, venda, rebuildForm),
+                /* () async {
                   await Navigator.of(context).pushNamed(AppRoutes.VENDA_FORM_PAGTO).then((object) {
-                    if (object != null) venda.pagtos.add(object as VendaPagamento);
+                    if (object == null) return;
+                    RetornoForm retornoForm = object as RetornoForm;
+                    if (!retornoForm.isDelete) venda.pagtos.add(retornoForm.objData as VendaPagamento);
                   });
                   rebuildForm();
-                },
+                }, */
                 child: Text('Adicionar Pagamento', style: TextStyle(color: Colors.green)),
               )),
         ],
@@ -178,14 +197,17 @@ class _UtilLstaPagtos {
                   child: ListTile(
                     contentPadding: UtilListTile.contentPaddingPadrao,
                     visualDensity: UtilListTile.visualDensityPadrao,
-                    onTap: () async {
+                    onTap: () => callEditRegistro(context, venda, pagto, rebuildForm),
+                    /* () async {
                       await Navigator.of(context)
                           .pushNamed(AppRoutes.VENDA_FORM_PAGTO, arguments: pagto)
                           .then((object) {
-                        if (object == null) venda.removePagtoVenda(pagto);
+                        if (object == null) return;
+                        RetornoForm retorno = object as RetornoForm;
+                        if (retorno.isDelete) venda.removePagtoVenda(pagto);
                       });
                       rebuildForm();
-                    },
+                    }, */
                     title: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -213,8 +235,7 @@ class _UtilLstaPagtos {
       decoration: BoxDecoration(
         color: backColor,
         borderRadius: new BorderRadius.only(
-            topLeft: Radius.circular(Util.borderRadiousPadrao),
-            topRight: Radius.circular(Util.borderRadiousPadrao)),
+            topLeft: Radius.circular(Util.borderRadiousPadrao), topRight: Radius.circular(Util.borderRadiousPadrao)),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -222,13 +243,11 @@ class _UtilLstaPagtos {
           Container(
               padding: EdgeInsets.all(7),
               height: _containerHeightButton,
-              child: Text(labelEsq,
-                  style: TextStyle(color: color /* , fontWeight: FontWeight.w500 */))),
+              child: Text(labelEsq, style: TextStyle(color: color /* , fontWeight: FontWeight.w500 */))),
           Container(
               padding: EdgeInsets.all(7),
               height: _containerHeightButton,
-              child: Text(labelDir,
-                  style: TextStyle(color: color /* , fontWeight: FontWeight.w500 */))),
+              child: Text(labelDir, style: TextStyle(color: color /* , fontWeight: FontWeight.w500 */))),
         ],
       ),
     );

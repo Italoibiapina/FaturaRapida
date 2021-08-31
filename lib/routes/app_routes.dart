@@ -11,4 +11,6 @@ class AppRoutes {
   static const VENDA_FORM_ITEM = '/venda-form-item';
   static const VENDA_LIST_PAGTO = '/venda-list-pagto';
   static const VENDA_FORM_PAGTO = '/venda-form-pagto';
+  static const VENDA_LIST_ENTREGA = '/venda-list-entrega';
+  static const VENDA_FORM_ENTREGA = '/venda-form-entrega';
 }

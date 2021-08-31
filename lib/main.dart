@@ -22,8 +22,11 @@ import 'package:pedido_facil/view/venda/venda_form_desc_frete.dart';
 import 'package:pedido_facil/view/venda/venda_form_item.dart';
 import 'package:pedido_facil/view/venda/venda_form_pagamento.dart';
 import 'package:pedido_facil/view/venda/venda_list.dart';
+import 'package:pedido_facil/view/venda/venda_list_entregas.dart';
 import 'package:pedido_facil/view/venda/venda_list_pagamentos.dart';
 import 'package:provider/provider.dart';
+
+import 'view/venda/venda_form_entrega.dart';
 
 void main() {
   runApp(PedidoFacil());
@@ -85,6 +88,8 @@ class _PedidoFacil extends State<PedidoFacil> {
           AppRoutes.VENDA_FORM_ITEM: (context) => VendaFormItem(),
           AppRoutes.VENDA_LIST_PAGTO: (context) => VendaListPagamentos(),
           AppRoutes.VENDA_FORM_PAGTO: (context) => VendaFormPagamento(),
+          AppRoutes.VENDA_LIST_ENTREGA: (context) => VendaListEntregas(),
+          AppRoutes.VENDA_FORM_ENTREGA: (context) => VendaFormEntrega(),
         },
         home: Scaffold(
           backgroundColor: Util.backColorPadrao,

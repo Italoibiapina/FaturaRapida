@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_masked_text2/flutter_masked_text2.dart';
 import 'package:pedido_facil/models/meio_pagamento.dart';
+import 'package:pedido_facil/models/util/retorno_form.dart';
 import 'package:pedido_facil/models/venda_pagamento.dart';
 import 'package:pedido_facil/provider/meio_pgto_provider.dart';
 import 'package:pedido_facil/util/util.dart';
@@ -17,10 +18,7 @@ class VendaFormPagamento extends StatefulWidget {
 
 class _VendaFormPagamentoState extends State<VendaFormPagamento> {
   late VendaPagamento vendaPgto = VendaPagamento(
-      id: DateTime.now().toString(),
-      dtPagto: DateTime.now(),
-      meioPagto: MeioPagamento(id: '-1', nm: ''),
-      vlPgto: 0);
+      id: DateTime.now().toString(), dtPagto: DateTime.now(), meioPagto: MeioPagamento(id: '-1', nm: ''), vlPgto: 0);
 
   final _form = GlobalKey<FormState>();
   //final Map<String, String> _formData = {};
@@ -61,7 +59,7 @@ class _VendaFormPagamentoState extends State<VendaFormPagamento> {
 
   save() {
     vendaPgto.vlPgto = vlPagtoControler.numberValue;
-    Navigator.of(context).pop(vendaPgto);
+    Navigator.of(context).pop(RetornoForm(objData: vendaPgto));
 
     /* final bool isValid = _form.currentState!.validate();
     _form.currentState!.save(); // Chama o metodos save de cada um do campos (TextFormField)
@@ -95,8 +93,9 @@ class _VendaFormPagamentoState extends State<VendaFormPagamento> {
 
     final _botoes = <Widget>[];
     if (!isNewRec)
-      _botoes
-          .add(IconButton(icon: Icon(Icons.delete), onPressed: () => Navigator.of(context).pop()));
+      _botoes.add(IconButton(
+          icon: Icon(Icons.delete),
+          onPressed: () => Navigator.of(context).pop(RetornoForm(isDelete: true, objData: vendaPgto))));
 
     final AppBar appBar = AppBar(
       title: Text('Pagamento da Venda'),

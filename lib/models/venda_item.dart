@@ -5,6 +5,7 @@ import 'IData.dart';
 class VendaItem extends IData {
   late final Produto prod;
   late int qtd;
+  int qtdEntregue;
 
   double get vlTot {
     return prod.vlVenda * qtd;
@@ -14,6 +15,7 @@ class VendaItem extends IData {
     id,
     required this.prod,
     this.qtd = 1,
+    this.qtdEntregue = 0,
   }) : super(id: id);
 
   VendaItem clone() {
@@ -21,6 +23,7 @@ class VendaItem extends IData {
       id: id,
       prod: prod,
       qtd: qtd,
+      qtdEntregue: qtdEntregue,
     );
   }
 }

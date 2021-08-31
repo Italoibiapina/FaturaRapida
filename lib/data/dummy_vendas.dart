@@ -1,5 +1,6 @@
 import 'package:pedido_facil/models/meio_pagamento.dart';
 import 'package:pedido_facil/models/venda.dart';
+import 'package:pedido_facil/models/venda_entrega.dart';
 import 'package:pedido_facil/models/venda_item.dart';
 import 'package:pedido_facil/models/venda_pagamento.dart';
 
@@ -20,6 +21,7 @@ final Dummy_vendas = {
         VendaItem(id: '2', prod: prods.values.elementAt(2), qtd: 1)
       ],
       pagtos: List<VendaPagamento>.empty(growable: true),
+      entregas: List<VendaEntrega>.empty(growable: true),
       vlDesconto: 10,
       vlFrete: 15,
       isPago: true,
@@ -34,6 +36,7 @@ final Dummy_vendas = {
         VendaItem(id: '4', prod: prods.values.elementAt(2), qtd: 2)
       ],
       pagtos: List<VendaPagamento>.empty(growable: true),
+      entregas: List<VendaEntrega>.empty(growable: true),
       isPago: false,
       isEnt: true),
   '3': Venda(
@@ -46,6 +49,7 @@ final Dummy_vendas = {
         VendaItem(id: '6', prod: prods.values.elementAt(2), qtd: 1)
       ],
       pagtos: List<VendaPagamento>.empty(growable: true),
+      entregas: List<VendaEntrega>.empty(growable: true),
       vlDesconto: 20,
       vlFrete: 25,
       isPago: true,
@@ -60,6 +64,7 @@ final Dummy_vendas = {
         VendaItem(id: '8', prod: prods.values.elementAt(2), qtd: 2)
       ],
       pagtos: List<VendaPagamento>.empty(growable: true),
+      entregas: List<VendaEntrega>.empty(growable: true),
       vlDesconto: 10,
       vlFrete: 35,
       dsEnd: 'Rua dos Bobos , 0, Sao Bernardo do Campo, SP, Brazil',
@@ -75,6 +80,7 @@ final Dummy_vendas = {
         VendaItem(id: '8', prod: prods.values.elementAt(2), qtd: 2)
       ],
       pagtos: List<VendaPagamento>.empty(growable: true),
+      entregas: List<VendaEntrega>.empty(growable: true),
       vlDesconto: 10,
       vlFrete: 15,
       isPago: false,
@@ -85,20 +91,35 @@ final Dummy_vendas = {
       dtPed: DateTime.now(),
       cli: clis.values.elementAt(2),
       itens: [
-        VendaItem(id: '7', prod: prods.values.elementAt(1), qtd: 2),
-        VendaItem(id: '8', prod: prods.values.elementAt(2), qtd: 2)
+        VendaItem(id: '7', prod: prods.values.elementAt(1), qtd: 2, qtdEntregue: 2),
+        VendaItem(id: '9', prod: prods.values.elementAt(3), qtd: 2, qtdEntregue: 1),
+        VendaItem(id: '9', prod: prods.values.elementAt(0), qtd: 2, qtdEntregue: 1),
       ],
       pagtos: [
         VendaPagamento(
-            id: '1',
-            dtPagto: DateTime.now(),
-            vlPgto: 10,
-            meioPagto: MeioPagamento(id: '1', nm: 'Cartão de Crédito')),
+            id: '1', dtPagto: DateTime.now(), vlPgto: 10, meioPagto: MeioPagamento(id: '1', nm: 'Cartão de Crédito')),
         VendaPagamento(
-            id: '2',
-            dtPagto: DateTime.now(),
-            vlPgto: 50,
-            meioPagto: MeioPagamento(id: '1', nm: 'Cartão de Débito')),
+            id: '2', dtPagto: DateTime.now(), vlPgto: 50, meioPagto: MeioPagamento(id: '1', nm: 'Cartão de Débito')),
+      ],
+      entregas: [
+        VendaEntrega(
+            id: DateTime.now().toString(),
+            dtEntrega: DateTime.now(),
+            entreguePara: 'Italo Ibiapina',
+            itenEntregues: [
+              VendaItem(id: '7', prod: prods.values.elementAt(1), qtd: 2, qtdEntregue: 1),
+              VendaItem(id: '9', prod: prods.values.elementAt(3), qtd: 2, qtdEntregue: 1),
+              VendaItem(id: '9', prod: prods.values.elementAt(0), qtd: 2, qtdEntregue: 1),
+            ],
+            obs: 'Observação'),
+        VendaEntrega(
+            id: DateTime.now().toString(),
+            dtEntrega: DateTime.now(),
+            entreguePara: 'Mara Lucia Falasca Ibiapina',
+            itenEntregues: [
+              //VendaItem(id: '8', prod: prods.values.elementAt(2), qtd: 2, qtdEntregue: 1),
+              VendaItem(id: '7', prod: prods.values.elementAt(1), qtd: 2, qtdEntregue: 1)
+            ])
       ],
       vlDesconto: 10,
       vlFrete: 15,

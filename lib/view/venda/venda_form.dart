@@ -119,8 +119,8 @@ class _VendaFormState extends State<VendaForm> {
                 children: [
                   UtilFormVenda.getBarraAddItem(context, venda, rebuildThisForm),
                   UtilFormVenda.getListVendaItens(venda!, rebuildThisForm),
-                  UtilFormVenda.getBarrasSumarizadora("Subtotal", Util.toCurency(venda!.vlTotItens),
-                      Colors.grey.shade400, Colors.white),
+                  UtilFormVenda.getBarrasSumarizadora(
+                      "Subtotal", Util.toCurency(venda!.vlTotItens), Colors.grey.shade400, Colors.white),
                 ],
               ),
             ),
@@ -145,16 +145,13 @@ class UtilFormVenda {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               InkWell(
-                child:
-                    Text(venda.nrPed, style: TextStyle(fontSize: 23, fontWeight: FontWeight.bold)),
+                child: Text(venda.nrPed, style: TextStyle(fontSize: 23, fontWeight: FontWeight.bold)),
                 onTap: () async {
-                  await Navigator.of(context)
-                      .pushNamed(AppRoutes.VENDA_FORM_CABECALHO, arguments: venda);
+                  await Navigator.of(context).pushNamed(AppRoutes.VENDA_FORM_CABECALHO, arguments: venda);
                   rebuild();
                 },
               ),
-              getStatusResumo(
-                  context, "Pagamento: " + venda.statusPagto, Colors.orange, false, venda, rebuild),
+              getStatusResumo(context, "Pagamento: " + venda.statusPagto, AppRoutes.VENDA_LIST_PAGTO, venda, rebuild),
             ],
           ),
           Row(
@@ -166,8 +163,7 @@ class UtilFormVenda {
               ),
               //Text(Util.toDateFormat(venda.dtPed), style: TextStyle(color: Colors.grey)),
               //getStatusResumo("Entrega: " + venda.statusEntrega, Colors.orange, true, venda),
-              getStatusResumo(
-                  context, "Entrega: " + venda.statusEntrega, Colors.orange, true, venda, rebuild),
+              getStatusResumo(context, "Entrega: " + venda.statusEntrega, AppRoutes.VENDA_LIST_ENTREGA, venda, rebuild),
             ],
           ),
         ],
@@ -175,32 +171,23 @@ class UtilFormVenda {
     );
   }
 
-  static Widget getStatusResumo(
-      context, String texto, Color cor, bool isShrink, Venda venda, Function rebuild) {
+  static Widget getStatusResumo(context, String texto, String route, Venda venda, Function rebuild) {
+    Color corTexto = Colors.orange;
+    Color corIcon = Colors.orange;
     return Container(
       margin: EdgeInsets.only(top: 5, bottom: 5),
       child: SizedBox(
           height: 30,
           child: OutlinedButton(
-              onPressed: () => {
-                    Navigator.of(context)
-                        .pushNamed(AppRoutes.VENDA_LIST_PAGTO, arguments: venda)
-                        .then((value) => rebuild())
-                    /* print("Dt Entrega : " + Util.toDateFormat(venda.dtPed)) */
-                  },
+              onPressed: () => {Navigator.of(context).pushNamed(route, arguments: venda).then((value) => rebuild())},
               child: Row(
                 children: [
-                  /* InkWell(
-                      child: Text(texto, style: TextStyle(color: cor), textAlign: TextAlign.right),
-                      onTap: () {
-                        print("Data de Venda: " + Util.toDateFormat(venda.dtPed));
-                      }), */
-                  Text(texto, style: TextStyle(color: cor), textAlign: TextAlign.right),
-                  Icon(Icons.navigate_next, color: cor),
+                  Text(texto, style: TextStyle(color: corTexto), textAlign: TextAlign.right),
+                  Icon(Icons.navigate_next, color: corIcon),
                 ],
               ),
               style: OutlinedButton.styleFrom(
-                  side: BorderSide(color: cor, width: 1),
+                  side: BorderSide(color: corTexto, width: 1),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5.0)),
                   padding: EdgeInsets.only(left: 8, right: 2, top: 0, bottom: 0)))),
     );
@@ -222,9 +209,7 @@ class UtilFormVenda {
         ],
       ),
       onTap: () async {
-        await Navigator.of(context)
-            .pushNamed(AppRoutes.CLIENTE_LIST, arguments: venda)
-            .then((object) {
+        await Navigator.of(context).pushNamed(AppRoutes.CLIENTE_LIST, arguments: venda).then((object) {
           if (object != null) {
             Cliente cliente = object as Cliente;
             venda.cli = cliente;
@@ -280,9 +265,7 @@ class UtilFormVenda {
 
                 return InkWell(
                   onTap: () async {
-                    await Navigator.of(context)
-                        .pushNamed(AppRoutes.VENDA_FORM_ITEM, arguments: item)
-                        .then((object) {
+                    await Navigator.of(context).pushNamed(AppRoutes.VENDA_FORM_ITEM, arguments: item).then((object) {
                       if (object == null) venda.removeItemVenda(item);
                     });
                     rebuildForm();
@@ -325,8 +308,12 @@ class UtilFormVenda {
                           ),
                         ),
                         Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
+                            Text(
+                              'Entregues : ' + item.qtdEntregue.toString() + '/' + item.qtd.toString(),
+                              style: TextStyle(color: Colors.grey),
+                            ),
                             Text(
                               item.qtd.toString() + ' x ' + Util.toCurency(item.prod.vlVenda),
                               style: TextStyle(color: Colors.grey),
@@ -348,8 +335,7 @@ class UtilFormVenda {
       children: [
         InkWell(
           onTap: () async {
-            await Navigator.of(context)
-                .pushNamed(AppRoutes.VENDA_FORM_DESC_FRETE, arguments: venda);
+            await Navigator.of(context).pushNamed(AppRoutes.VENDA_FORM_DESC_FRETE, arguments: venda);
             rebuild();
           },
           child: Container(
@@ -366,8 +352,7 @@ class UtilFormVenda {
         ),
         InkWell(
           onTap: () async {
-            await Navigator.of(context)
-                .pushNamed(AppRoutes.VENDA_FORM_DESC_FRETE, arguments: venda);
+            await Navigator.of(context).pushNamed(AppRoutes.VENDA_FORM_DESC_FRETE, arguments: venda);
             rebuild();
           },
           child: Container(
@@ -423,9 +408,7 @@ class UtilFormVenda {
           child: Row(children: [
             Container(
               margin: EdgeInsets.only(
-                  left: Util.contentPaddingPadrao,
-                  right: Util.contentPaddingPadrao,
-                  top: Util.contentPaddingPadrao),
+                  left: Util.contentPaddingPadrao, right: Util.contentPaddingPadrao, top: Util.contentPaddingPadrao),
               child: Text("Observações", style: TextStyle(color: Colors.grey)),
             ),
           ]),
@@ -481,12 +464,10 @@ class UtilFormVenda {
         children: [
           Container(
               height: _containerHeightButton,
-              child: TextButton(
-                  onPressed: () => {}, child: Text(labelEsq, style: TextStyle(color: color)))),
+              child: TextButton(onPressed: () => {}, child: Text(labelEsq, style: TextStyle(color: color)))),
           Container(
               height: _containerHeightButton,
-              child: TextButton(
-                  onPressed: () => {}, child: Text(labelDir, style: TextStyle(color: color)))),
+              child: TextButton(onPressed: () => {}, child: Text(labelDir, style: TextStyle(color: color)))),
         ],
       ),
     );
