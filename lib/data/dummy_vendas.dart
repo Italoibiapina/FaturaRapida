@@ -1,8 +1,6 @@
 import 'package:pedido_facil/models/meio_pagamento.dart';
 import 'package:pedido_facil/models/venda.dart';
-import 'package:pedido_facil/models/venda_entrega.dart';
 import 'package:pedido_facil/models/venda_item.dart';
-import 'package:pedido_facil/models/venda_pagamento.dart';
 
 import 'dummy_clientes.dart';
 import 'dummy_produtos.dart';
@@ -88,18 +86,18 @@ final Dummy_vendas = {
   '6': Venda(
       id: '6',
       nrPed: 'PED006',
-      dtPed: DateTime.now(),
-      cli: clis.values.elementAt(2),
+      //dtPed: DateTime.now(),
+      //cli: clis.values.elementAt(2),
       itens: [
         VendaItem(id: '7', prod: prods.values.elementAt(1), qtd: 2, qtdEntregue: 2),
         VendaItem(id: '9', prod: prods.values.elementAt(3), qtd: 2, qtdEntregue: 1),
-        VendaItem(id: '9', prod: prods.values.elementAt(0), qtd: 2, qtdEntregue: 1),
+        VendaItem(id: '10', prod: prods.values.elementAt(0), qtd: 2, qtdEntregue: 1),
       ],
       pagtos: [
         VendaPagamento(
-            id: '1', dtPagto: DateTime.now(), vlPgto: 10, meioPagto: MeioPagamento(id: '1', nm: 'Cartão de Crédito')),
+            id: '1', dtPagto: DateTime.now(), vlPgto: 10.0, meioPagto: MeioPagamento(id: '1', nm: 'Cartão de Crédito')),
         VendaPagamento(
-            id: '2', dtPagto: DateTime.now(), vlPgto: 50, meioPagto: MeioPagamento(id: '1', nm: 'Cartão de Débito')),
+            id: '2', dtPagto: DateTime.now(), vlPgto: 50.0, meioPagto: MeioPagamento(id: '1', nm: 'Cartão de Débito')),
       ],
       entregas: [
         VendaEntrega(
@@ -107,9 +105,18 @@ final Dummy_vendas = {
             dtEntrega: DateTime.now(),
             entreguePara: 'Italo Ibiapina',
             itenEntregues: [
-              VendaItem(id: '7', prod: prods.values.elementAt(1), qtd: 2, qtdEntregue: 1),
-              VendaItem(id: '9', prod: prods.values.elementAt(3), qtd: 2, qtdEntregue: 1),
-              VendaItem(id: '9', prod: prods.values.elementAt(0), qtd: 2, qtdEntregue: 1),
+              VendaItemEntrega(
+                  id: '7',
+                  vendaItem: VendaItem(id: '7', prod: prods.values.elementAt(1), qtd: 2, qtdEntregue: 2),
+                  qtdEntregueEntrega: 1),
+              VendaItemEntrega(
+                  id: '9',
+                  vendaItem: VendaItem(id: '9', prod: prods.values.elementAt(3), qtd: 2, qtdEntregue: 1),
+                  qtdEntregueEntrega: 1),
+              VendaItemEntrega(
+                  id: '10',
+                  vendaItem: VendaItem(id: '9', prod: prods.values.elementAt(0), qtd: 2, qtdEntregue: 1),
+                  qtdEntregueEntrega: 1),
             ],
             obs: 'Observação'),
         VendaEntrega(
@@ -118,7 +125,10 @@ final Dummy_vendas = {
             entreguePara: 'Mara Lucia Falasca Ibiapina',
             itenEntregues: [
               //VendaItem(id: '8', prod: prods.values.elementAt(2), qtd: 2, qtdEntregue: 1),
-              VendaItem(id: '7', prod: prods.values.elementAt(1), qtd: 2, qtdEntregue: 1)
+              VendaItemEntrega(
+                  id: '7',
+                  vendaItem: VendaItem(id: '7', prod: prods.values.elementAt(1), qtd: 2, qtdEntregue: 2),
+                  qtdEntregueEntrega: 1)
             ])
       ],
       vlDesconto: 10,

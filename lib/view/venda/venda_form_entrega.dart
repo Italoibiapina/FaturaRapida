@@ -1,32 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_masked_text2/flutter_masked_text2.dart';
-import 'package:pedido_facil/models/IData.dart';
 import 'package:pedido_facil/models/meio_pagamento.dart';
 import 'package:pedido_facil/models/util/retorno_form.dart';
 import 'package:pedido_facil/models/venda.dart';
-import 'package:pedido_facil/models/venda_entrega.dart';
-import 'package:pedido_facil/models/venda_item.dart';
 import 'package:pedido_facil/util/util.dart';
 import 'package:pedido_facil/util/util_form.dart';
 import 'package:pedido_facil/util/util_list_tile.dart';
 
 class VendaFormEntrega extends StatefulWidget {
-  const VendaFormEntrega({Key? key}) : super(key: key);
+  final VendaEntrega vendaEntrega;
+  const VendaFormEntrega(this.vendaEntrega, {Key? key}) : super(key: key);
 
   @override
-  _VendaFormEntregaState createState() => _VendaFormEntregaState();
+  _VendaFormEntregaState createState() => _VendaFormEntregaState(vendaEntrega);
 }
 
 class _VendaFormEntregaState extends State<VendaFormEntrega> {
-  late Venda venda;
-  late VendaEntrega vendaEntrega = VendaEntrega(
-    id: DateTime.now().toString(),
-    dtEntrega: DateTime.now(),
-    entreguePara: '',
-    obs: '',
-    itenEntregues: List<VendaItem>.empty(),
-  );
+  //late Venda venda;
+  final VendaEntrega vendaEntrega;
+  _VendaFormEntregaState(this.vendaEntrega);
 
   final _form = GlobalKey<FormState>();
   final Map<String, String> _formData = {};
@@ -49,12 +42,9 @@ class _VendaFormEntregaState extends State<VendaFormEntrega> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     if (ModalRoute.of(context)!.settings.arguments != null) {
-      List<IData> arqs = ModalRoute.of(context)!.settings.arguments as List<IData>;
-      venda = arqs[0] as Venda;
-      vendaEntrega = arqs.length > 1 ? arqs[1] as VendaEntrega : vendaEntrega;
+      //vendaEntrega = ModalRoute.of(context)!.settings.arguments as VendaEntrega;
       _formData['entreguePara'] = vendaEntrega.entreguePara;
       _formData['obs'] = vendaEntrega.obs;
-      //vlPagtoControler.updateValue(vendaPgto.vlPgto);
       isNewRec = false;
     }
     vDtControler.text = Util.toDateFormat(vendaEntrega.dtEntrega);
@@ -162,14 +152,15 @@ class _VendaFormEntregaState extends State<VendaFormEntrega> {
   listaItensEntrega() => ListView.builder(
         physics: NeverScrollableScrollPhysics(), // sem scroll na lista view
         shrinkWrap: true,
-        itemCount: venda.itens.length > 0 ? venda.itens.length + 1 : venda.itens.length,
+        itemCount:
+            vendaEntrega.itensEntregaCount > 0 ? vendaEntrega.itensEntregaCount + 1 : vendaEntrega.itensEntregaCount,
         itemBuilder: (BuildContext context, int index) {
           if (index == 0) return tituloLista();
 
           index -= 1;
-          VendaItem item = venda.itens[index];
+          VendaItemEntrega itemEntrega = vendaEntrega.itemEntregueByIndex(index);
           return Container(
-              decoration: index == (venda.itens.length - 1) ? null : UtilListTile.boxDecorationPadrao,
+              decoration: index == (vendaEntrega.itensEntregaCount - 1) ? null : UtilListTile.boxDecorationPadrao,
               child: Container(
                 padding: EdgeInsets.only(left: Util.paddingFormPadrao, right: Util.paddingFormPadrao),
                 child: ListTile(
@@ -178,17 +169,23 @@ class _VendaFormEntregaState extends State<VendaFormEntrega> {
                   title: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Flexible(child: Text(item.prod.nm, overflow: TextOverflow.visible)),
+                      Flexible(child: Text(itemEntrega.vendaItem.prod.nm, overflow: TextOverflow.visible)),
                       Container(
-                        child: qtdEntregaEditor(item),
+                        child: qtdEntregaEditor(itemEntrega),
                       )
                     ],
                   ),
                   //Text(itemEntrega.prod.nm /* , style: TextStyle(height: 1, fontSize: 14) */),
                   subtitle: Text(
-                    'Entregues : ' + item.qtdEntregue.toString() + '/' + item.qtd.toString(),
-                    style: TextStyle(color: Colors.grey),
-                  ),
+                      'Entregues : ' +
+                          itemEntrega.vendaItem.qtdEntregue.toString() +
+                          '/' +
+                          itemEntrega.vendaItem.qtd.toString(),
+                      style: TextStyle(
+                        color: itemEntrega.vendaItem.qtdEntregue > itemEntrega.vendaItem.qtd
+                            ? Colors.redAccent
+                            : Colors.grey,
+                      )),
                   //trailing: qtdEntregaEditor(itemEntrega)
                   //Text(vendaEntrega.itenEntregues[index].qtdEntregue.toString()),
                 ),
@@ -223,8 +220,8 @@ class _VendaFormEntregaState extends State<VendaFormEntrega> {
         ),
       );
 
-  qtdEntregaEditor(VendaItem itemVenda) {
-    int vQtdEntregues = vendaEntrega.qtdItensEntreguesByProdId(itemVenda.prod.id);
+  qtdEntregaEditor(VendaItemEntrega itemEntrega) {
+    //int vQtdEntregues = vendaEntrega.qtdItensEntreguesByProdId(itemVenda.prod.id);
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -234,12 +231,15 @@ class _VendaFormEntregaState extends State<VendaFormEntrega> {
           icon: Icon(Icons.remove),
           color: Colors.orangeAccent,
           onPressed: () => setState(() {
-            itemVenda.qtdEntregue -= 1;
+            if (itemEntrega.qtdEntregueEntrega > 0) {
+              itemEntrega.vendaItem.qtdEntregue--;
+              itemEntrega.qtdEntregueEntrega--;
+            }
           }),
         ),
         Container(
           width: 50,
-          child: Center(child: Text(vQtdEntregues.toString())),
+          child: Center(child: Text(itemEntrega.qtdEntregueEntrega.toString())),
         ),
         IconButton(
           padding: EdgeInsets.zero,
@@ -247,7 +247,9 @@ class _VendaFormEntregaState extends State<VendaFormEntrega> {
           icon: Icon(Icons.add),
           color: Colors.orangeAccent,
           onPressed: () => setState(() {
-            itemVenda.qtdEntregue += 1;
+            itemEntrega.vendaItem.qtdEntregue++;
+            itemEntrega.qtdEntregueEntrega++;
+            //itenEntrega.qtdEntregue++;
           }),
         ),
       ],

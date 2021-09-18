@@ -8,35 +8,39 @@ import 'package:pedido_facil/routes/app_routes.dart';
 import 'package:pedido_facil/util/util.dart';
 import 'package:pedido_facil/util/util_list_tile.dart';
 import 'package:pedido_facil/util/widget/date_picker_widget.dart';
+import 'package:pedido_facil/view/cliente/cliente_list.dart';
+import 'package:pedido_facil/view/venda/venda_form_cabecalho.dart';
+import 'package:pedido_facil/view/venda/venda_list_entregas.dart';
+import 'package:pedido_facil/view/venda/venda_list_pagamentos.dart';
 
 import 'package:provider/provider.dart';
 
 class VendaForm extends StatefulWidget {
-  final Venda? venda;
-  const VendaForm({Key? key, this.venda}) : super(key: key);
+  final Venda venda;
+  const VendaForm({Key? key, required this.venda}) : super(key: key);
 
   @override
   _VendaFormState createState() => _VendaFormState(venda: venda);
 }
 
 class _VendaFormState extends State<VendaForm> {
-  late Venda? venda;
-  _VendaFormState({this.venda}) : super();
+  final Venda venda;
+  _VendaFormState({required this.venda}) : super();
 
   //late final Object? regUpd;
   final _form = GlobalKey<FormState>();
   final Map<String, String> _formData = {};
 
-  rebuildThisForm() {
+  _rebuildThisForm() {
     setState(() {
       //print("Dt Pedido: " + Util.toDateFormat(venda!.dtPed));
     });
   }
 
   void _loadFormData() {
-    if (venda != null) {
-      print("Antes de testar o produto  : " + venda.toString());
-    }
+    //if (venda != null) {
+    print("Antes de testar o produto  : " + venda.toString());
+    //}
   }
 
   /// Usar este metodos para quando refazer o parte grafica "Build method" não precisar
@@ -109,23 +113,24 @@ class _VendaFormState extends State<VendaForm> {
             UtilFormVenda.getBlockData(
               height: 90,
               marginTop: false,
-              child: UtilFormVenda.getResumoPedido(venda!, context, rebuildThisForm),
+              child: UtilFormVenda.getResumoPedido(
+                  venda, context, _callVendaCabecalho, _callVendaPagtoLista, _callVendaEntregaLista),
             ),
             UtilFormVenda.getBlockData(
-                height: 45, child: UtilFormVenda.getSecaoCliente(venda!, context, rebuildThisForm)),
+                height: 45, child: UtilFormVenda.getSecaoCliente(venda, context, _callSelecionarCliente)),
             //UtilFormVenda.getBlockDataClean(UtilFormVenda.getListVendaItens(venda)),
             UtilFormVenda.getBlockDataClean(
               Column(
                 children: [
-                  UtilFormVenda.getBarraAddItem(context, venda, rebuildThisForm),
-                  UtilFormVenda.getListVendaItens(venda!, rebuildThisForm),
+                  UtilFormVenda.getBarraAddItem(context, venda, _rebuildThisForm),
+                  UtilFormVenda.getListVendaItens(venda, _rebuildThisForm),
                   UtilFormVenda.getBarrasSumarizadora(
-                      "Subtotal", Util.toCurency(venda!.vlTotItens), Colors.grey.shade400, Colors.white),
+                      "Subtotal", Util.toCurency(venda.vlTotItens), Colors.grey.shade400, Colors.white),
                 ],
               ),
             ),
             UtilFormVenda.getBlockDataClean(
-              UtilFormVenda.getSecaoDescFretePagto(venda!, context, rebuildThisForm),
+              UtilFormVenda.getSecaoDescFretePagto(venda, context, _rebuildThisForm),
             ),
             UtilFormVenda.getBlockDataClean(
               UtilFormVenda.getSecaoSigObs(),
@@ -133,10 +138,45 @@ class _VendaFormState extends State<VendaForm> {
           ],
         ));
   }
+
+  _callSelecionarCliente(context) async {
+    /// onPressed TEM QUE SER com "context, new MaterialPageRoute(builder: ..."
+    /// ASSIM POR CONTA DO FORM_VENDA esta sebdo chamdo de uma lista que esta dentrp de uma TAB
+    await Navigator.push(context, new MaterialPageRoute(builder: (context) => ClienteList(isSearch: true)))
+        .then((object) {
+      if (object != null) {
+        Cliente cliente = object as Cliente;
+        venda.cli = cliente;
+      }
+    });
+    _rebuildThisForm();
+  }
+
+  _callVendaCabecalho(context) async {
+    /// onPressed TEM QUE SER com "context, new MaterialPageRoute(builder: ..."
+    /// ASSIM POR CONTA DO FORM_VENDA esta sebdo chamdo de uma lista que esta dentrp de uma TAB
+    await Navigator.push(context, new MaterialPageRoute(builder: (context) => VendaFormCabecalho(venda: venda)));
+    _rebuildThisForm();
+  }
+
+  _callVendaPagtoLista(context) async {
+    /// onPressed TEM QUE SER com "context, new MaterialPageRoute(builder: ..."
+    /// ASSIM POR CONTA DO FORM_VENDA esta sebdo chamdo de uma lista que esta dentrp de uma TAB
+    await Navigator.push(context, new MaterialPageRoute(builder: (context) => VendaListPagamentos(venda)));
+    _rebuildThisForm();
+  }
+
+  _callVendaEntregaLista(context) async {
+    /// onPressed TEM QUE SER com "context, new MaterialPageRoute(builder: ..."
+    /// ASSIM POR CONTA DO FORM_VENDA esta sebdo chamdo de uma lista que esta dentrp de uma TAB
+    await Navigator.push(context, new MaterialPageRoute(builder: (context) => VendaListEntregas(venda)));
+    _rebuildThisForm();
+  }
 }
 
 class UtilFormVenda {
-  static Container getResumoPedido(Venda venda, context, Function rebuild) {
+  static Container getResumoPedido(
+      Venda venda, context, Function callCabecalhoForm, Function callPagtoList, Function callEntregaList) {
     return Container(
       margin: EdgeInsets.only(top: 5),
       child: Column(
@@ -146,12 +186,14 @@ class UtilFormVenda {
             children: [
               InkWell(
                 child: Text(venda.nrPed, style: TextStyle(fontSize: 23, fontWeight: FontWeight.bold)),
-                onTap: () async {
+                onTap: () => callCabecalhoForm(context),
+                /* onTap: () async {
                   await Navigator.of(context).pushNamed(AppRoutes.VENDA_FORM_CABECALHO, arguments: venda);
                   rebuild();
-                },
+                }, */
               ),
-              getStatusResumo(context, "Pagamento: " + venda.statusPagto, AppRoutes.VENDA_LIST_PAGTO, venda, rebuild),
+              getStatusResumo(context, "Pagamento: " + venda.statusPagto,
+                  callPagtoList /* AppRoutes.VENDA_LIST_PAGTO, venda, rebuild */),
             ],
           ),
           Row(
@@ -163,7 +205,8 @@ class UtilFormVenda {
               ),
               //Text(Util.toDateFormat(venda.dtPed), style: TextStyle(color: Colors.grey)),
               //getStatusResumo("Entrega: " + venda.statusEntrega, Colors.orange, true, venda),
-              getStatusResumo(context, "Entrega: " + venda.statusEntrega, AppRoutes.VENDA_LIST_ENTREGA, venda, rebuild),
+              getStatusResumo(context, "Entrega: " + venda.statusEntrega,
+                  callEntregaList /* AppRoutes.VENDA_LIST_ENTREGA, venda, rebuild */),
             ],
           ),
         ],
@@ -171,7 +214,8 @@ class UtilFormVenda {
     );
   }
 
-  static Widget getStatusResumo(context, String texto, String route, Venda venda, Function rebuild) {
+  static Widget getStatusResumo(
+      context, String texto, Function callLista /* String route, Venda venda, Function rebuild */) {
     Color corTexto = Colors.orange;
     Color corIcon = Colors.orange;
     return Container(
@@ -179,7 +223,14 @@ class UtilFormVenda {
       child: SizedBox(
           height: 30,
           child: OutlinedButton(
-              onPressed: () => {Navigator.of(context).pushNamed(route, arguments: venda).then((value) => rebuild())},
+              onPressed: () => callLista(context),
+              /* onPressed: () => {
+                    Navigator.of(context).pushNamed(route, arguments: venda).then(
+                      (value) {
+                        rebuild();
+                      },
+                    )
+                  }, */
               child: Row(
                 children: [
                   Text(texto, style: TextStyle(color: corTexto), textAlign: TextAlign.right),
@@ -193,7 +244,7 @@ class UtilFormVenda {
     );
   }
 
-  static InkWell getSecaoCliente(Venda venda, context, Function rebuild) {
+  static InkWell getSecaoCliente(Venda venda, context, Function callSelecionarCliente) {
     return InkWell(
       child: Row(
         children: [
@@ -205,24 +256,16 @@ class UtilFormVenda {
           // ignore: unnecessary_null_comparison
           Text(venda.cli == null ? "Informe o cliente" : venda.cli.nm),
           new Spacer(), // I just added one line
-          Icon(Icons.navigate_next, color: Colors.black) // This Icon
+          Icon(Icons.navigate_next, color: Colors.black), // This Icon
         ],
       ),
-      onTap: () async {
-        await Navigator.of(context).pushNamed(AppRoutes.CLIENTE_LIST, arguments: venda).then((object) {
-          if (object != null) {
-            Cliente cliente = object as Cliente;
-            venda.cli = cliente;
-          }
-        });
-        rebuild();
-      },
+      onTap: () => callSelecionarCliente(context),
     );
   }
 
   static final _containerHeightButton = 30.0;
 
-  static Container getBarraAddItem(context, venda, rebuildForm) {
+  static Container getBarraAddItem(context, Venda venda, rebuildForm) {
     ButtonStyle _btStyle = TextButton.styleFrom(
       padding: const EdgeInsets.only(
           left: Util.contentPaddingPadrao, right: Util.contentPaddingPadrao, top: 0.0, bottom: 0.0),
@@ -242,7 +285,7 @@ class UtilFormVenda {
                 style: _btStyle,
                 onPressed: () async {
                   await Navigator.of(context).pushNamed(AppRoutes.VENDA_FORM_ITEM).then((object) {
-                    if (object != null) venda!.itens.add(object as VendaItem);
+                    if (object != null) venda.addItem(object as VendaItem);
                   });
                   rebuildForm();
                 },
@@ -254,19 +297,19 @@ class UtilFormVenda {
   }
 
   static Widget getListVendaItens(Venda venda, rebuildForm) {
-    return venda.itens.length > 0
+    return venda.itensCount > 0
         ? Container(
             child: ListView.builder(
               physics: NeverScrollableScrollPhysics(), // sem scroll na lista view
               shrinkWrap: true, //para expandir o widget Pai
-              itemCount: venda.itens.length,
+              itemCount: venda.itensCount,
               itemBuilder: (context, index) {
-                final item = venda.itens.elementAt(index);
+                final item = venda.itensByIndex(index);
 
                 return InkWell(
                   onTap: () async {
                     await Navigator.of(context).pushNamed(AppRoutes.VENDA_FORM_ITEM, arguments: item).then((object) {
-                      if (object == null) venda.removeItemVenda(item);
+                      if (object == null) venda.removeItem(item);
                     });
                     rebuildForm();
                   },
@@ -312,7 +355,7 @@ class UtilFormVenda {
                           children: [
                             Text(
                               'Entregues : ' + item.qtdEntregue.toString() + '/' + item.qtd.toString(),
-                              style: TextStyle(color: Colors.grey),
+                              style: TextStyle(color: item.qtdEntregue > item.qtd ? Colors.redAccent : Colors.grey),
                             ),
                             Text(
                               item.qtd.toString() + ' x ' + Util.toCurency(item.prod.vlVenda),

@@ -68,8 +68,7 @@ class UtilForm {
 
   static Scaffold getFormContainerPadrao(String tituloForm, saveFnc, deleteFnc, Form form) {
     var _botoes = <Widget>[IconButton(icon: Icon(Icons.save), onPressed: () => saveFnc())];
-    if (deleteFnc != null)
-      _botoes.add(IconButton(icon: Icon(Icons.delete), onPressed: () => deleteFnc()));
+    if (deleteFnc != null) _botoes.add(IconButton(icon: Icon(Icons.delete), onPressed: () => deleteFnc()));
 
     final AppBar appBar = AppBar(
       title: Text(tituloForm),
@@ -81,6 +80,7 @@ class UtilForm {
 
   static Scaffold getFormContainerPadraoAppCustom(AppBar appBar, Form form) {
     return Scaffold(
+        resizeToAvoidBottomInset: false,
         backgroundColor: Util.backColorPadrao,
         appBar: appBar,
         body: Container(
@@ -88,14 +88,12 @@ class UtilForm {
             child: Container(
               padding: EdgeInsets.all(Util.paddingFormPadrao),
               decoration: new BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: new BorderRadius.circular(Util.borderRadiousPadrao)),
+                  color: Colors.white, borderRadius: new BorderRadius.circular(Util.borderRadiousPadrao)),
               child: form,
             )));
   }
 
-  static showDialogSimNao(
-      context, String titulo, String msg, Function fncConf, Function fncNaoConf) {
+  static showDialogSimNao(context, String titulo, String msg, Function fncConf, Function fncNaoConf) {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -123,8 +121,7 @@ class UtilForm {
     });
   }
 
-  static DateTime? showDialogEditarDescartar(
-      context, String titulo, String msg, Function fncDescartar) {
+  static DateTime? showDialogEditarDescartar(context, String titulo, String msg, Function fncDescartar) {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(

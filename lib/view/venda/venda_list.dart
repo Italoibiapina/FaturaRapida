@@ -24,7 +24,7 @@ class _VendaListState extends State<VendaList> {
 
   @override
   Widget build(BuildContext context) {
-    final VendaProvider vendas = Provider.of(context);
+    final VendaProvider vendasProvider = Provider.of(context);
     return MaterialApp(
       home: DefaultTabController(
         length: 4,
@@ -35,7 +35,8 @@ class _VendaListState extends State<VendaList> {
               actions: <Widget>[
                 IconButton(
                   icon: Icon(Icons.add),
-                  onPressed: () => Navigator.of(context).pushNamed(AppRoutes.VENDA_FORM),
+                  onPressed: () => Navigator.of(context).pushNamed(AppRoutes.VENDA_FORM /* , arguments:  */),
+                  //Navigator.push(context, new MaterialPageRoute(builder: (context) => VendaForm(venda: venda))),
                 )
               ],
               bottom: TabBar(
@@ -53,10 +54,10 @@ class _VendaListState extends State<VendaList> {
               )),
           body: TabBarView(
             children: [
-              _UtilLstaCliente.buildList(vendas.all),
-              _UtilLstaCliente.buildList(vendas.pend),
-              _UtilLstaCliente.buildList(vendas.pagas),
-              _UtilLstaCliente.buildList(vendas.entregues), //ConteudoDaLista(lstVendas),
+              _UtilLstaCliente.buildList(vendasProvider.all, vendasProvider),
+              _UtilLstaCliente.buildList(vendasProvider.pend, vendasProvider),
+              _UtilLstaCliente.buildList(vendasProvider.pagas, vendasProvider),
+              _UtilLstaCliente.buildList(vendasProvider.entregues, vendasProvider), //ConteudoDaLista(lstVendas),
             ],
           ),
         ),
@@ -77,8 +78,7 @@ class VendaTile extends StatelessWidget {
         contentPadding: UtilListTile.contentPaddingPadrao,
         visualDensity: UtilListTile.visualDensityPadrao,
         // onPressed TEM QUE SER com "context, new MaterialPageRoute(builder: ..." ASSIM POR CONTA DE ESTARMOS DENTRO DE UMA TAB
-        onTap: () => Navigator.push(
-            context, new MaterialPageRoute(builder: (context) => new VendaForm(venda: venda))),
+        onTap: () => Navigator.push(context, new MaterialPageRoute(builder: (context) => VendaForm(venda: venda))),
         onLongPress: () {
           print("Longo Press!!!");
         },
@@ -105,25 +105,31 @@ class VendaTile extends StatelessWidget {
 
 class _UtilLstaCliente {
   static final _containerHeightButton = 35.0;
-  static Container _acoesLista(context) => Container(
-        margin: new EdgeInsets.only(bottom: Util.marginScreenPadrao),
-        padding: EdgeInsets.all(0),
-        decoration: BoxDecoration(
-            color: Colors.white, borderRadius: new BorderRadius.circular(Util.borderRadiousPadrao)),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-                height: _containerHeightButton,
-                padding: EdgeInsets.only(left: 10.0),
-                child: TextButton(
-                    // onPressed TEM QUE SER com "context, new MaterialPageRoute(builder: ..." ASSIM POR CONTA DE ESTARMOS DENTRO DE UMA TAB
-                    onPressed: () => Navigator.push(
-                        context, new MaterialPageRoute(builder: (context) => new VendaForm())),
-                    child: Text("Cadastrar Novo Venda", style: TextStyle(color: Colors.green)))),
-          ],
-        ),
-      );
+  static Container _acoesLista(context, VendaProvider vendasProvider) {
+    String nextNrPed = vendasProvider.nextNrPed;
+    Venda venda = Venda(id: DateTime.now().toString(), nrPed: nextNrPed);
+    return Container(
+      margin: new EdgeInsets.only(bottom: Util.marginScreenPadrao),
+      padding: EdgeInsets.all(0),
+      decoration: BoxDecoration(color: Colors.white, borderRadius: new BorderRadius.circular(Util.borderRadiousPadrao)),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+              height: _containerHeightButton,
+              padding: EdgeInsets.only(left: 10.0),
+              child: TextButton(
+                  // onPressed TEM QUE SER com "context, new MaterialPageRoute(builder: ..." ASSIM POR CONTA DE ESTARMOS DENTRO DE UMA TAB
+                  onPressed: () {
+                    /* final Map<String, Object> itens = {...Dummy_vendas};
+                    final Venda vendaTeste = itens.values.last as Venda; */
+                    Navigator.push(context, new MaterialPageRoute(builder: (context) => new VendaForm(venda: venda)));
+                  },
+                  child: Text("Cadastrar Novo Venda", style: TextStyle(color: Colors.green)))),
+        ],
+      ),
+    );
+  }
 
   static final Container _tituloLista = Container(
     decoration: BoxDecoration(
@@ -152,7 +158,7 @@ class _UtilLstaCliente {
     ),
   );
 
-  static Container buildList(vendas) {
+  static Container buildList(vendas, VendaProvider vendasProvider) {
     //print('buildList: ' + vendas.leght.toString());
     return Container(
       margin: new EdgeInsets.all(Util.marginScreenPadrao),
@@ -160,7 +166,7 @@ class _UtilLstaCliente {
         itemCount: vendas.length > 0 ? vendas.length + 2 : vendas.length,
         itemBuilder: (BuildContext context, int index) {
           print('Indice Lista Methodo:' + index.toString());
-          if (index == 0) return _UtilLstaCliente._acoesLista(context);
+          if (index == 0) return _UtilLstaCliente._acoesLista(context, vendasProvider);
           if (index == 1) return _UtilLstaCliente._tituloLista;
 
           index -= 2;

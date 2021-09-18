@@ -11,6 +11,17 @@ class VendaProvider extends CrudProvider {
     return [...itens.values];
   }
 
+  String get nextNrPed {
+    String nrNextPed = '001';
+    if (itens.values.length > 0) {
+      Venda ultVenda = itens.values.last as Venda;
+      int nrNextPedInt = int.parse(ultVenda.nrPed.substring(3));
+      nrNextPedInt++;
+      nrNextPed = nrNextPedInt.toString().padLeft(3, '0');
+    }
+    return 'PED' + nrNextPed;
+  }
+
   List get pend {
     var vendaPend = itens.values.where((element) {
       var vVenda = element as Venda;
@@ -43,8 +54,10 @@ class VendaProvider extends CrudProvider {
   }
 
   List byCliente(Cliente cliente, Venda vendaDesconsiderar) {
+    //if (cliente == null) return List<Venda>.empty();
     var vendasCli = itens.values.where((element) {
       var vVenda = element as Venda;
+      //if (vVenda.cli == null) return false;
       return vendaDesconsiderar.nrPed != vVenda.nrPed && vVenda.cli.id == cliente.id;
     }).toList();
     return vendasCli;

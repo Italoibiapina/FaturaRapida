@@ -2,25 +2,28 @@ import 'package:flutter/material.dart';
 import 'package:pedido_facil/models/venda.dart';
 import 'package:pedido_facil/util/util_form.dart';
 
-class VendaFormCabelcalho extends StatefulWidget {
-  const VendaFormCabelcalho({Key? key}) : super(key: key);
+class VendaFormCabecalho extends StatefulWidget {
+  final Venda venda;
+  VendaFormCabecalho({Key? key, required this.venda}) : super(key: key);
 
   @override
-  _VendaFormCabelcalhoState createState() => _VendaFormCabelcalhoState();
+  _VendaFormCabecalhoState createState() => _VendaFormCabecalhoState(venda);
 }
 
-class _VendaFormCabelcalhoState extends State<VendaFormCabelcalho> {
-  late final Object? regUpd;
+class _VendaFormCabecalhoState extends State<VendaFormCabecalho> {
+  final Venda venda;
+  _VendaFormCabecalhoState(this.venda);
+  //late final Venda regUpd;
   final _form = GlobalKey<FormState>();
   final Map<String, String> _formData = {};
 
-  void _loadFormData(Object? regUpd) {
+  void _loadFormData(/* Object? regUpd */) {
     //print("Antes de testar o produto  ");
-    if (regUpd != null) {
-      Venda venda = regUpd as Venda;
-      _formData['nrPed'] = venda.nrPed;
-      _formData['dtPed'] = venda.dtPed.toString();
-    }
+    //if (regUpd != null) {
+    //Venda venda = regUpd as Venda;
+    _formData['nrPed'] = venda.nrPed;
+    _formData['dtPed'] = venda.dtPed.toString();
+    //}
   }
 
   /// Usar este metodos para quando refazer o parte grafica "Build method" não precisar
@@ -28,8 +31,8 @@ class _VendaFormCabelcalhoState extends State<VendaFormCabelcalho> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    regUpd = ModalRoute.of(context)!.settings.arguments;
-    _loadFormData(regUpd);
+    //regUpd = ModalRoute.of(context)!.settings.arguments;
+    _loadFormData();
   }
 
   save() {
@@ -37,7 +40,7 @@ class _VendaFormCabelcalhoState extends State<VendaFormCabelcalho> {
     if (isValid) {
       _form.currentState!.save(); // Chama o metodos save de cada um do campos (TextFormField)
 
-      Venda venda = regUpd as Venda;
+      //Venda venda = regUpd as Venda;
       venda.nrPed = _formData["nrPed"] as String;
       Navigator.of(context).pop();
     }
@@ -63,11 +66,9 @@ class _VendaFormCabelcalhoState extends State<VendaFormCabelcalho> {
               TextFormField(
                 initialValue: _formData['nrPed'],
                 decoration: InputDecoration(
-                    labelText:
-                        'Número do Pedido' /* , fillColor: Util.backColorPadrao, filled: true */),
+                    labelText: 'Número do Pedido' /* , fillColor: Util.backColorPadrao, filled: true */),
                 validator: (value) {
-                  return UtilForm.valTextFormField(
-                      valor: value.toString(), mandatorio: true, tamMax: 8);
+                  return UtilForm.valTextFormField(valor: value.toString(), mandatorio: true, tamMax: 8);
                 },
                 onSaved: (value) => _formData['nrPed'] = value!,
               )

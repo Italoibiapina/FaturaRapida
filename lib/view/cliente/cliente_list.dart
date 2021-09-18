@@ -7,14 +7,15 @@ import 'package:pedido_facil/util/util_list_tile.dart';
 import 'package:provider/provider.dart';
 
 class ClienteList extends StatelessWidget {
-  const ClienteList({Key? key}) : super(key: key);
+  final bool isSearch;
+  const ClienteList({Key? key, this.isSearch = false}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final ClienteProvider clis = Provider.of(context);
 
-    var args = ModalRoute.of(context)!.settings.arguments;
-    final isSearch = args != null; // se tiver passado algum
+    /* var args = ModalRoute.of(context)!.settings.arguments;
+    final isSearch = args != null; // se tiver passado algum */
 
     return Scaffold(
       backgroundColor: Util.backColorPadrao,
@@ -70,13 +71,12 @@ class ClienteTile extends StatelessWidget {
         leading: CircleAvatar(
           backgroundColor: Colors.blue,
           foregroundColor: Colors.white,
-          child: Text(cliente.getNmIniciais(),
-              style: TextStyle(fontWeight: FontWeight.normal, fontSize: 18.0)),
+          child: Text(cliente.getNmIniciais(), style: TextStyle(fontWeight: FontWeight.normal, fontSize: 18.0)),
         ),
         title: Text(cliente.nm, style: TextStyle(fontWeight: FontWeight.bold)),
         subtitle: Text(cliente.nrPed.toString() + ' Pedidos'),
-        trailing: Text(Util.toCurency(cliente.vlTotPed),
-            style: TextStyle(fontWeight: FontWeight.normal, fontSize: 16.0)),
+        trailing:
+            Text(Util.toCurency(cliente.vlTotPed), style: TextStyle(fontWeight: FontWeight.normal, fontSize: 16.0)),
       ),
     );
   }
@@ -87,8 +87,8 @@ class _UtilLstaCliente {
   static Container _acoesLista(context) => Container(
         margin: new EdgeInsets.only(bottom: Util.marginScreenPadrao),
         padding: EdgeInsets.all(0),
-        decoration: BoxDecoration(
-            color: Colors.white, borderRadius: new BorderRadius.circular(Util.borderRadiousPadrao)),
+        decoration:
+            BoxDecoration(color: Colors.white, borderRadius: new BorderRadius.circular(Util.borderRadiousPadrao)),
         //height: 35,
         child: Container(
           child: Row(
@@ -104,8 +104,7 @@ class _UtilLstaCliente {
                   height: _containerHeightButton,
                   padding: EdgeInsets.only(right: 5.0),
                   child: TextButton(
-                      onPressed: () => {},
-                      child: Text("Importar do Telefone", style: TextStyle(color: Colors.green)))),
+                      onPressed: () => {}, child: Text("Importar do Telefone", style: TextStyle(color: Colors.green)))),
             ],
           ),
         ),
@@ -120,14 +119,12 @@ class _UtilLstaCliente {
     ),
     height: 28,
     child: Container(
-      decoration: BoxDecoration(
-          border: Border(bottom: BorderSide(width: 1.0, color: Colors.grey.shade300))),
+      decoration: BoxDecoration(border: Border(bottom: BorderSide(width: 1.0, color: Colors.grey.shade300))),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Container(
-              padding: EdgeInsets.only(left: 60.0),
-              child: Text("Nome", style: TextStyle(color: Colors.grey.shade600))),
+              padding: EdgeInsets.only(left: 60.0), child: Text("Nome", style: TextStyle(color: Colors.grey.shade600))),
           Container(
               padding: EdgeInsets.only(right: 10.0),
               child: Text("Valor Vendido", style: TextStyle(color: Colors.grey.shade600))),

@@ -3,26 +3,30 @@ import 'package:flutter/services.dart';
 import 'package:flutter_masked_text2/flutter_masked_text2.dart';
 import 'package:pedido_facil/models/meio_pagamento.dart';
 import 'package:pedido_facil/models/util/retorno_form.dart';
-import 'package:pedido_facil/models/venda_pagamento.dart';
+import 'package:pedido_facil/models/venda.dart';
 import 'package:pedido_facil/provider/meio_pgto_provider.dart';
 import 'package:pedido_facil/util/util.dart';
 import 'package:pedido_facil/util/util_form.dart';
 import 'package:provider/provider.dart';
 
 class VendaFormPagamento extends StatefulWidget {
-  const VendaFormPagamento({Key? key}) : super(key: key);
+  final VendaPagamento vendaPgto;
+  const VendaFormPagamento(this.vendaPgto, {Key? key}) : super(key: key);
 
   @override
-  _VendaFormPagamentoState createState() => _VendaFormPagamentoState();
+  _VendaFormPagamentoState createState() => _VendaFormPagamentoState(vendaPgto);
 }
 
 class _VendaFormPagamentoState extends State<VendaFormPagamento> {
-  late VendaPagamento vendaPgto = VendaPagamento(
-      id: DateTime.now().toString(), dtPagto: DateTime.now(), meioPagto: MeioPagamento(id: '-1', nm: ''), vlPgto: 0);
+  final VendaPagamento vendaPgto;
+  _VendaFormPagamentoState(this.vendaPgto);
+  /*  = VendaPagamento(
+      id: DateTime.now().toString(), dtPagto: DateTime.now(), meioPagto: MeioPagamento(id: '-1', nm: ''), vlPgto: 0); */
 
   final _form = GlobalKey<FormState>();
   //final Map<String, String> _formData = {};
   bool isNewRec = true;
+  bool acabouEntrar = true;
 
   final vMeioPagtoTextEditControler = TextEditingController();
   final vlPagtoControler = MoneyMaskedTextController(leftSymbol: 'R\$ ');
@@ -47,12 +51,15 @@ class _VendaFormPagamentoState extends State<VendaFormPagamento> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    if (ModalRoute.of(context)!.settings.arguments != null) {
-      vendaPgto = ModalRoute.of(context)!.settings.arguments as VendaPagamento;
+    //if (ModalRoute.of(context)!.settings.arguments != null) {
+    //vendaPgto = ModalRoute.of(context)!.settings.arguments as VendaPagamento;
+    if (acabouEntrar) {
       vMeioPagtoTextEditControler.text = vendaPgto.meioPagto.nm;
       vlPagtoControler.updateValue(vendaPgto.vlPgto);
       isNewRec = false;
+      acabouEntrar = false;
     }
+    //}
     vDtControler.text = Util.toDateFormat(vendaPgto.dtPagto);
     //_formData['qtd'] = vendaItem.qtd.toString();
   }
@@ -60,31 +67,6 @@ class _VendaFormPagamentoState extends State<VendaFormPagamento> {
   save() {
     vendaPgto.vlPgto = vlPagtoControler.numberValue;
     Navigator.of(context).pop(RetornoForm(objData: vendaPgto));
-
-    /* final bool isValid = _form.currentState!.validate();
-    _form.currentState!.save(); // Chama o metodos save de cada um do campos (TextFormField)
-    if (isValid) {
-      //vendaItem.prod.nm = _formData['nmProd'].toString(); //_formData['nmProd'].toString();
-      vendaPgto.vlPgto = vlPagtoControler.numberValue;
-      //vendaItem.qtd = int.parse(_formData['qtd'].toString());
-
-      Navigator.of(context).pop(vendaPgto);
-    } else {
-      if (isNewRec) {
-        if ((_formData['nmProd'].toString() == "" || _formData['nmProd'] == null) &&
-            _formData['qtd'].toString() == "" &&
-            vlPagtoControler.numberValue == 0.0) {
-          Navigator.of(context).pop();
-        } else {
-          UtilForm.showDialogEditarDescartar(
-            context,
-            'Atenção',
-            'Alguns campos possuem dados inválidos, Você deseja continuar editando ou descartar as alterações?',
-            () => {Navigator.of(context).pop()},
-          );
-        }
-      }
-    } */
   }
 
   @override

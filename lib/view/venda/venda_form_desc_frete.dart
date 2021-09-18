@@ -156,11 +156,9 @@ class UtilFomrDescFrete {
   static Container getTituloListHist() {
     return Container(
       height: 28,
-      decoration: BoxDecoration(
-          border: Border(bottom: BorderSide(width: 1.0, color: Colors.grey.shade300))),
+      decoration: BoxDecoration(border: Border(bottom: BorderSide(width: 1.0, color: Colors.grey.shade300))),
       child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-        Text('Histórico Pagamento de Entrega',
-            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.grey))
+        Text('Histórico Pagamento de Entrega', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.grey))
       ]),
     );
   }
