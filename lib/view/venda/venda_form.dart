@@ -30,7 +30,7 @@ class _VendaFormState extends State<VendaForm> {
 
   //late final Object? regUpd;
   final _form = GlobalKey<FormState>();
-  final Map<String, String> _formData = {};
+  //final Map<String, String> _formData = {};
 
   _rebuildThisForm() {
     setState(() {
