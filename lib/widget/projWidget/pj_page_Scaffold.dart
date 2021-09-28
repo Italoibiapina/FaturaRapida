@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 
-class PjPageListaScaffold extends StatelessWidget {
+import 'pj_container_rounded.dart';
+
+class PjPageListaScaffoldList extends StatelessWidget {
   final String titulo;
   final List<Widget> children;
   final List<Widget> childrenWithContainer = List<Widget>.empty(growable: true);
-  PjPageListaScaffold({Key? key, required this.titulo, required this.children}) : super(key: key);
+  PjPageListaScaffoldList({Key? key, required this.titulo, required this.children}) : super(key: key);
 
   putChildContainer() {
     double marginTop = 0;
@@ -26,24 +28,6 @@ class PjPageListaScaffold extends StatelessWidget {
         padding: const EdgeInsets.all(5.0 /* Util.marginScreenPadrao */),
         children: childrenWithContainer,
       ),
-    );
-  }
-}
-
-class PjContainerRouded extends StatelessWidget {
-  final Widget child;
-  final double marginTop;
-  const PjContainerRouded({Key? key, required this.child, required this.marginTop}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: EdgeInsets.only(top: marginTop.toDouble()),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: new BorderRadius.all(const Radius.circular(5.0 /*Util.borderRadiousPadrao*/)),
-      ),
-      child: child,
     );
   }
 }

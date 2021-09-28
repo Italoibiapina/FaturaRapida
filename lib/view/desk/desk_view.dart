@@ -9,7 +9,6 @@ import 'package:pedido_facil/routes/app_routes.dart';
 //import 'package:pedido_facil/routes/app_routes.dart';
 import 'package:pedido_facil/util/util.dart';
 import 'package:pedido_facil/view/inicio/inicio.dart';
-import 'package:pedido_facil/view/produto/produto_form.dart';
 import 'package:pedido_facil/view/produto/produto_list.dart';
 
 class DeskView extends StatefulWidget {
@@ -26,7 +25,7 @@ class _DeskViewState extends State<DeskView> {
 
   static List<Widget> _widgetOptions = <Widget>[
     ProdutoList(),
-    ProdutoForm(),
+    //ProdutoForm(),
     Text('Index 0: Home', style: optionStyle),
     Text('Index 1: Business', style: optionStyle),
     Text('Index 2: School', style: optionStyle),
@@ -44,7 +43,7 @@ class _DeskViewState extends State<DeskView> {
       routes: {
         AppRoutes.INICIO: (context) => Inicio(),
         AppRoutes.PRODUTO_LIST: (context) => ProdutoList(),
-        AppRoutes.PRODUTO_FORM: (context) => ProdutoForm(),
+        //AppRoutes.PRODUTO_FORM: (context) => ProdutoForm(),
       },
       home: Scaffold(
         backgroundColor: Util.backColorPadrao,

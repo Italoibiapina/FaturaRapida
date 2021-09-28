@@ -1,19 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:pedido_facil/models/cliente.dart';
+import 'package:pedido_facil/models/produto.dart';
+import 'package:pedido_facil/models/util/retorno_form.dart';
 import 'package:pedido_facil/models/venda.dart';
 import 'package:pedido_facil/models/venda_item.dart';
-import 'package:pedido_facil/provider/cliente_provider.dart';
 import 'package:pedido_facil/provider/crud_provider.dart';
-import 'package:pedido_facil/routes/app_routes.dart';
 import 'package:pedido_facil/util/util.dart';
 import 'package:pedido_facil/util/util_list_tile.dart';
 import 'package:pedido_facil/util/widget/date_picker_widget.dart';
 import 'package:pedido_facil/view/cliente/cliente_list.dart';
 import 'package:pedido_facil/view/venda/venda_form_cabecalho.dart';
+import 'package:pedido_facil/view/venda/venda_form_desc_frete.dart';
+import 'package:pedido_facil/view/venda/venda_form_item.dart';
 import 'package:pedido_facil/view/venda/venda_list_entregas.dart';
 import 'package:pedido_facil/view/venda/venda_list_pagamentos.dart';
-
-import 'package:provider/provider.dart';
+import 'package:pedido_facil/widget/projWidget/helper_classes.dart';
 
 class VendaForm extends StatefulWidget {
   final Venda venda;
@@ -56,15 +57,15 @@ class _VendaFormState extends State<VendaForm> {
     if (isValid) {
       _form.currentState!.save();
 
-      final cli = Cliente(
+      /* final cli = Cliente(
+        _formData["nm"].toString(),
         id: _formData["id"].toString(),
-        nm: _formData["nm"].toString(),
         fone: double.parse(_formData["fone"].toString()),
         email: _formData["email"].toString(),
         //foto: _formData["foto"].toString(),
-      );
-      var provider = Provider.of<ClienteProvider>(context, listen: false);
-      provider.put(cli);
+      ); */
+      //var provider = Provider.of<ClienteProvider>(context, listen: false);
+      //provider.put(cli);
       Navigator.of(context).pop();
     }
   }
@@ -97,6 +98,10 @@ class _VendaFormState extends State<VendaForm> {
 
   @override
   Widget build(BuildContext context) {
+    final PjTopBarListActionHelper topBarActionItemVendaHelper = getTopListActionItemVenda(context);
+    final PjListaDadosHelper listaItenVendaHelper = getListaDadosHelper();
+    final PjBarraSumarizadoraHelper barraSumItensVendaHelper = getBarraSumListaHelper();
+
     return Scaffold(
         backgroundColor: Util.backColorPadrao,
         appBar: AppBar(
@@ -122,15 +127,14 @@ class _VendaFormState extends State<VendaForm> {
             UtilFormVenda.getBlockDataClean(
               Column(
                 children: [
-                  UtilFormVenda.getBarraAddItem(context, venda, _rebuildThisForm),
-                  UtilFormVenda.getListVendaItens(venda, _rebuildThisForm),
-                  UtilFormVenda.getBarrasSumarizadora(
-                      "Subtotal", Util.toCurency(venda.vlTotItens), Colors.grey.shade400, Colors.white),
+                  topBarActionItemVendaHelper.getWidget(),
+                  listaItenVendaHelper.getWidget(),
+                  barraSumItensVendaHelper.getWidget(),
                 ],
               ),
             ),
             UtilFormVenda.getBlockDataClean(
-              UtilFormVenda.getSecaoDescFretePagto(venda, context, _rebuildThisForm),
+              UtilFormVenda.getSecaoDescFretePagto(venda, context, _callEditDescontoFrete /* _rebuildThisForm */),
             ),
             UtilFormVenda.getBlockDataClean(
               UtilFormVenda.getSecaoSigObs(),
@@ -171,6 +175,120 @@ class _VendaFormState extends State<VendaForm> {
     /// ASSIM POR CONTA DO FORM_VENDA esta sebdo chamdo de uma lista que esta dentrp de uma TAB
     await Navigator.push(context, new MaterialPageRoute(builder: (context) => VendaListEntregas(venda)));
     _rebuildThisForm();
+  }
+
+  _callNovoItemVenda(context) async {
+    final VendaItem vendaItem =
+        VendaItem(id: DateTime.now().toString(), prod: Produto(id: 'novoItem', nm: '', vlVenda: 0));
+
+    /// onPressed TEM QUE SER com "context, new MaterialPageRoute(builder: ..."
+    /// ASSIM POR CONTA DA FORM_VENDA/LISTA_PAGTO esta sendo chamado de uma lista que esta dentro de uma TAB
+    await Navigator.push(context, new MaterialPageRoute(builder: (context) => VendaFormItem(vendaItem))).then((object) {
+      if (object == null) return;
+      RetornoForm retornoForm = object as RetornoForm;
+      if (!retornoForm.isDelete) {
+        VendaItem vendaItemRetorno = retornoForm.objData as VendaItem;
+        venda.addItem(vendaItemRetorno);
+      }
+    });
+
+    _rebuildThisForm();
+  }
+
+  _callEditItemVenda(context, VendaItem item) async {
+    /// onPressed TEM QUE SER com "context, new MaterialPageRoute(builder: ..."
+    /// ASSIM POR CONTA DA FORM_VENDA/LISTA_PAGTO esta sendo chamado de uma lista que esta dentro de uma TAB
+    await Navigator.push(context, new MaterialPageRoute(builder: (context) => VendaFormItem(item))).then((object) {
+      if (object == null) return;
+      RetornoForm retorno = object as RetornoForm;
+      if (retorno.isDelete) venda.removeItem(item);
+    });
+    _rebuildThisForm();
+  }
+
+  _callEditDescontoFrete(context) async {
+    /// onPressed TEM QUE SER com "context, new MaterialPageRoute(builder: ..."
+    /// ASSIM POR CONTA DA FORM_VENDA/LISTA_PAGTO esta sendo chamado de uma lista que esta dentro de uma TAB
+    await Navigator.push(context, new MaterialPageRoute(builder: (context) => VendaFormDescFrete(venda)));
+    _rebuildThisForm();
+
+    //await Navigator.of(context).pushNamed(AppRoutes.VENDA_FORM_DESC_FRETE, arguments: venda);
+  }
+
+  PjTopBarListActionHelper getTopListActionItemVenda(context) {
+    return PjTopBarListActionHelper(
+        textActEsq: 'Adicionar Item',
+        actFncEsq: () {
+          _callNovoItemVenda(context);
+        });
+  }
+
+  PjListaDadosHelper getListaDadosHelper() {
+    return PjListaDadosHelper(
+      countRecords: venda.itensCount,
+      listViewDados: _getListViewItens(),
+      msgSemDados: 'Pedido sem itens',
+    );
+  }
+
+  PjBarraSumarizadoraHelper getBarraSumListaHelper() {
+    return PjBarraSumarizadoraHelper(labelEsq: "Subtotal 2", labelDir: Util.toCurency(venda.vlTotItens));
+  }
+
+  ListView _getListViewItens() {
+    return ListView.builder(
+      physics: NeverScrollableScrollPhysics(), // sem scroll na lista view
+      shrinkWrap: true, //para expandir o widget Pai
+      itemCount: venda.itensCount,
+      itemBuilder: (context, index) {
+        final item = venda.itensByIndex(index);
+
+        return InkWell(
+          onTap: () async {
+            _callEditItemVenda(context, item);
+            /* await Navigator.of(context).pushNamed(AppRoutes.VENDA_FORM_ITEM, arguments: item).then((object) {
+              if (object == null) venda.removeItem(item);
+            });
+            _rebuildThisForm(); */
+          },
+          child: Container(
+            decoration: UtilListTile.boxDecorationPadrao,
+            padding: EdgeInsets.all(Util.contentPaddingPadrao),
+            child: Column(
+              children: [
+                Container(
+                  margin: EdgeInsets.only(bottom: 5),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Flexible(
+                          child: Text(
+                        item.prod.nm,
+                        overflow: TextOverflow.ellipsis,
+                      )),
+                      Text(Util.toCurency(item.vlTot)),
+                    ],
+                  ),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Entregues : ' + item.qtdEntregue.toString() + '/' + item.qtd.toString(),
+                      style: TextStyle(color: item.qtdEntregue > item.qtd ? Colors.redAccent : Colors.grey),
+                    ),
+                    Text(
+                      item.qtd.toString() + ' x ' + Util.toCurency(item.prod.vlVenda),
+                      style: TextStyle(color: Colors.grey),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 }
 
@@ -265,7 +383,7 @@ class UtilFormVenda {
 
   static final _containerHeightButton = 30.0;
 
-  static Container getBarraAddItem(context, Venda venda, rebuildForm) {
+  /* static Container getBarraAddItem(context, Venda venda, rebuildForm) {
     ButtonStyle _btStyle = TextButton.styleFrom(
       padding: const EdgeInsets.only(
           left: Util.contentPaddingPadrao, right: Util.contentPaddingPadrao, top: 0.0, bottom: 0.0),
@@ -294,9 +412,9 @@ class UtilFormVenda {
         ],
       ),
     );
-  }
+  } */
 
-  static Widget getListVendaItens(Venda venda, rebuildForm) {
+  /* static Widget getListVendaItens(Venda venda, rebuildForm) {
     return venda.itensCount > 0
         ? Container(
             child: ListView.builder(
@@ -317,23 +435,7 @@ class UtilFormVenda {
                     decoration: UtilListTile.boxDecorationPadrao,
                     padding: EdgeInsets.all(Util.contentPaddingPadrao),
                     child:
-                        /* ListTile(
-                      visualDensity: VisualDensity(horizontal: 0, vertical: -3),
-                      //mainAxisAlignment: MainAxisAlignment.spaceBetween,
-
-                      title: Text(item.prod.nm),
-
-                      trailing: Column(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          Text(Util.toCurency(item.vlTot)),
-                          Text(
-                            '' + item.qtd.toString() + ' x ' + Util.toCurency(item.prod.vlVenda),
-                            style: TextStyle(color: Colors.grey),
-                          ),
-                        ],
-                      ),
-                    ), */
+                        
                         Column(
                       children: [
                         Container(
@@ -371,15 +473,16 @@ class UtilFormVenda {
             ),
           )
         : Container(height: 40, child: const Center(child: Text('Pedido sem itens')));
-  }
+  } */
 
-  static Column getSecaoDescFretePagto(Venda venda, context, Function rebuild) {
+  static Column getSecaoDescFretePagto(Venda venda, context, /* Function rebuild, */ Function callFormEdit) {
     return Column(
       children: [
         InkWell(
           onTap: () async {
-            await Navigator.of(context).pushNamed(AppRoutes.VENDA_FORM_DESC_FRETE, arguments: venda);
-            rebuild();
+            callFormEdit(context);
+            /* await Navigator.of(context).pushNamed(AppRoutes.VENDA_FORM_DESC_FRETE, arguments: venda);
+            rebuild(); */
           },
           child: Container(
             padding: EdgeInsets.all(Util.contentPaddingPadrao),
@@ -395,8 +498,9 @@ class UtilFormVenda {
         ),
         InkWell(
           onTap: () async {
-            await Navigator.of(context).pushNamed(AppRoutes.VENDA_FORM_DESC_FRETE, arguments: venda);
-            rebuild();
+            callFormEdit(context);
+            /* await Navigator.of(context).pushNamed(AppRoutes.VENDA_FORM_DESC_FRETE, arguments: venda);
+            rebuild(); */
           },
           child: Container(
             padding: EdgeInsets.all(Util.contentPaddingPadrao),

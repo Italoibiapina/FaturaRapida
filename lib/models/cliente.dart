@@ -5,20 +5,19 @@ import 'IData.dart';
 
 class Cliente extends IData {
   //final String id;
-  final String nm;
+  String nm;
   double? fone;
   String? email;
+  DateTime? dtNasc;
   final int nrPed;
   final double vlTotPed;
   Image? foto;
 
-  Cliente(
-      {id, required this.nm, this.fone, this.email, this.foto, this.nrPed = 0, this.vlTotPed = 0})
+  Cliente(this.nm, {id, this.fone, this.email, this.dtNasc, this.foto, this.nrPed = 0, this.vlTotPed = 0})
       : super(id: id);
 
   Cliente clone() {
-    return Cliente(
-        id: id, nm: nm, fone: fone, email: email, foto: foto, nrPed: nrPed, vlTotPed: vlTotPed);
+    return Cliente(nm, id: id, fone: fone, email: email, dtNasc: dtNasc, foto: foto, nrPed: nrPed, vlTotPed: vlTotPed);
   }
 
   getNmIniciais() => UtilModel.getNmIniciais(this.nm);

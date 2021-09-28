@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:pedido_facil/models/cliente.dart';
 import 'package:pedido_facil/provider/cliente_provider.dart';
-import 'package:pedido_facil/routes/app_routes.dart';
 import 'package:pedido_facil/util/util.dart';
 import 'package:pedido_facil/util/util_list_tile.dart';
+import 'package:pedido_facil/view/cliente/cliente_form.dart';
+import 'package:pedido_facil/widget/projWidget/helper_classes.dart';
+import 'package:pedido_facil/widget/projWidget/pj_page_Scaffold.dart';
 import 'package:provider/provider.dart';
 
 class ClienteList extends StatelessWidget {
@@ -17,7 +19,19 @@ class ClienteList extends StatelessWidget {
     /* var args = ModalRoute.of(context)!.settings.arguments;
     final isSearch = args != null; // se tiver passado algum */
 
-    return Scaffold(
+    final PjTopBarListActionHelper topBarActionHelper = getTopListAction(context);
+    final PjTituloListHelper tituloLista = PjTituloListHelper(textActEsq: 'Nome', textActDir: 'Valor Vendido');
+    final PjListaDadosHelper listaDadosHelper = getListaDadosHelper(clis, isSearch);
+
+    return PjPageListaScaffoldList(
+      titulo: 'Clientes',
+      children: [
+        Column(children: [topBarActionHelper.getWidget()]),
+        Column(children: [tituloLista.getWidget(), listaDadosHelper.getWidget()]),
+      ],
+    );
+
+    /* return Scaffold(
       backgroundColor: Util.backColorPadrao,
       appBar: AppBar(
         title: Text('Clientes'),
@@ -26,7 +40,8 @@ class ClienteList extends StatelessWidget {
           IconButton(
               icon: Icon(Icons.add),
               onPressed: () {
-                Navigator.of(context).pushNamed(AppRoutes.CLIENTE_FORM);
+                //Navigator.of(context).pushNamed(AppRoutes.CLIENTE_FORM);
+                _callNovoRegistro(context);
               }),
         ],
       ),
@@ -45,91 +60,84 @@ class ClienteList extends StatelessWidget {
           },
         ),
       ),
+    ); */
+  }
+
+  PjTopBarListActionHelper getTopListAction(context) {
+    return PjTopBarListActionHelper(
+      textActEsq: 'Novo Cliente',
+      actFncEsq: () {
+        _callNovoRegistro(context);
+      },
+      textActDir: 'Importar do Telefone2',
+      actFncDir: () {},
+      withMargin: true,
     );
   }
-}
 
-class ClienteTile extends StatelessWidget {
-  final Cliente cliente;
-  final bool isSearch;
-  const ClienteTile({Key? key, required this.cliente, required this.isSearch}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: UtilListTile.boxDecorationPadrao,
-      child: ListTile(
-        contentPadding: UtilListTile.contentPaddingPadrao,
-        visualDensity: UtilListTile.visualDensityPadrao,
-        onTap: () {
-          if (isSearch) {
-            Navigator.of(context).pop(cliente);
-          } else {
-            Navigator.of(context).pushNamed(AppRoutes.CLIENTE_FORM, arguments: cliente);
-          }
-        },
-        leading: CircleAvatar(
-          backgroundColor: Colors.blue,
-          foregroundColor: Colors.white,
-          child: Text(cliente.getNmIniciais(), style: TextStyle(fontWeight: FontWeight.normal, fontSize: 18.0)),
-        ),
-        title: Text(cliente.nm, style: TextStyle(fontWeight: FontWeight.bold)),
-        subtitle: Text(cliente.nrPed.toString() + ' Pedidos'),
-        trailing:
-            Text(Util.toCurency(cliente.vlTotPed), style: TextStyle(fontWeight: FontWeight.normal, fontSize: 16.0)),
-      ),
+  PjListaDadosHelper getListaDadosHelper(ClienteProvider clis, bool isSerach) {
+    return PjListaDadosHelper(
+      countRecords: clis.count,
+      listViewDados: _getListViewCliente(clis, isSerach),
+      msgSemDados: 'Não há clientes cadastrados',
     );
   }
-}
 
-class _UtilLstaCliente {
-  static final _containerHeightButton = 35.0;
-  static Container _acoesLista(context) => Container(
-        margin: new EdgeInsets.only(bottom: Util.marginScreenPadrao),
-        padding: EdgeInsets.all(0),
-        decoration:
-            BoxDecoration(color: Colors.white, borderRadius: new BorderRadius.circular(Util.borderRadiousPadrao)),
-        //height: 35,
-        child: Container(
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Container(
-                  height: _containerHeightButton,
-                  padding: EdgeInsets.only(left: 10.0),
-                  child: TextButton(
-                      onPressed: () => {Navigator.of(context).pushNamed(AppRoutes.CLIENTE_FORM)},
-                      child: Text("Cadastrar Novo", style: TextStyle(color: Colors.green)))),
-              Container(
-                  height: _containerHeightButton,
-                  padding: EdgeInsets.only(right: 5.0),
-                  child: TextButton(
-                      onPressed: () => {}, child: Text("Importar do Telefone", style: TextStyle(color: Colors.green)))),
-            ],
+  ListView _getListViewCliente(ClienteProvider clis, bool isSearch) {
+    return ListView.builder(
+      scrollDirection: Axis.vertical,
+      shrinkWrap: true,
+      itemCount: clis.count,
+      itemBuilder: (BuildContext context, int index) {
+        Cliente cliente = clis.byIndex(index);
+        return Container(
+          padding: EdgeInsets.all(0),
+          margin: EdgeInsets.all(0),
+          decoration: UtilListTile.boxDecorationPadrao,
+          child: ListTile(
+            contentPadding: UtilListTile.contentPaddingPadrao,
+            visualDensity: UtilListTile.visualDensityPadrao,
+            onTap: () {
+              if (isSearch) {
+                Navigator.of(context).pop(cliente);
+              } else {
+                _callEditRegistro(context, cliente);
+                //Navigator.of(context).pushNamed(AppRoutes.CLIENTE_FORM, arguments: cliente);
+              }
+            },
+            leading: CircleAvatar(
+              backgroundColor: Colors.blue,
+              foregroundColor: Colors.white,
+              child: Text(cliente.getNmIniciais(), style: TextStyle(fontWeight: FontWeight.normal, fontSize: 18.0)),
+            ),
+            title: Text(cliente.nm, style: TextStyle(fontWeight: FontWeight.bold)),
+            subtitle: Text(cliente.nrPed.toString() + ' Pedidos'),
+            trailing:
+                Text(Util.toCurency(cliente.vlTotPed), style: TextStyle(fontWeight: FontWeight.normal, fontSize: 16.0)),
           ),
-        ),
-      );
+        );
+      },
+    );
+  }
 
-  static final Container _tituloLista = Container(
-    decoration: BoxDecoration(
-      color: Colors.white,
-      borderRadius: new BorderRadius.only(
-          topLeft: const Radius.circular(Util.borderRadiousPadrao),
-          topRight: const Radius.circular(Util.borderRadiousPadrao)),
-    ),
-    height: 28,
-    child: Container(
-      decoration: BoxDecoration(border: Border(bottom: BorderSide(width: 1.0, color: Colors.grey.shade300))),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Container(
-              padding: EdgeInsets.only(left: 60.0), child: Text("Nome", style: TextStyle(color: Colors.grey.shade600))),
-          Container(
-              padding: EdgeInsets.only(right: 10.0),
-              child: Text("Valor Vendido", style: TextStyle(color: Colors.grey.shade600))),
-        ],
-      ),
-    ),
-  );
+  _callNovoRegistro(context) async {
+    Cliente cliente = Cliente('', email: '', id: "-1");
+
+    /// onPressed TEM QUE SER com "context, new MaterialPageRoute(builder: ..."
+    /// ASSIM POR CONTA DA FORM_VENDA/LISTA_PAGTO esta sendo chamado de uma lista que esta dentro de uma TAB
+    await Navigator.push(context, new MaterialPageRoute(builder: (context) => ClienteForm(cliente)))
+        /* .then((object) {
+      if (object == null) return;
+      RetornoForm retornoForm = object as RetornoForm;
+      if (!retornoForm.isDelete) venda.addEntrega(retornoForm.objData as VendaEntrega);
+    }) */
+        ;
+    //rebuildThisForm();
+  }
+
+  _callEditRegistro(context, Cliente cliente) async {
+    /// onPressed TEM QUE SER com "context, new MaterialPageRoute(builder: ..."
+    /// ASSIM POR CONTA DA FORM_VENDA/LISTA_PAGTO esta sendo chamado de uma lista que esta dentro de uma TAB
+    await Navigator.push(context, new MaterialPageRoute(builder: (context) => ClienteForm(cliente)));
+  }
 }

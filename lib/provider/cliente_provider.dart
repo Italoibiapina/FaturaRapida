@@ -7,7 +7,13 @@ class ClienteProvider extends CrudProvider {
   ClienteProvider(ICrudRepository repository) : super(repository);
 
   List<Cliente> get all {
-    return [...itens.values] as List<Cliente>;
+    List<Cliente> lista = List<Cliente>.empty(growable: true);
+    [...itens.values].forEach((element) {
+      lista.add(element as Cliente);
+    });
+    //[...itens.values].map((e) => lista.add(e as Cliente));
+
+    return lista;
   }
 
   Cliente byIndex(int i) {

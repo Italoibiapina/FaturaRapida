@@ -38,7 +38,7 @@ class Venda extends IData {
       this.dsEnd = ''})
       : super(id: id) {
     this.dtPed = dtPed == null ? DateTime.now() : dtPed;
-    this.cli = cli != null ? cli : Cliente(id: '-1', nm: 'Informe o cliente');
+    this.cli = cli != null ? cli : Cliente('Informe o cliente', id: '-1');
     _itens = itens != null ? itens : List<VendaItem>.empty(growable: true);
     _pagtos = pagtos != null ? pagtos : List<VendaPagamento>.empty(growable: true);
     _entregas = entregas != null ? entregas : List<VendaEntrega>.empty(growable: true);
@@ -106,6 +106,15 @@ class Venda extends IData {
   removeItem(VendaItem vendaItem) {
     _itens = _itens.where((i) => i.id != vendaItem.id).toList();
     _calcTotItens();
+    _calcQtdItens();
+
+    _entregas.forEach((element) {
+      VendaEntrega entrega = element;
+      List<VendaItemEntrega> itensEntrega = entrega.itenEntregues.where((i) => i.vendaItem.id != vendaItem.id).toList();
+      entrega.itenEntregues = itensEntrega;
+      entrega._calcTotItensEntregues();
+    });
+    _calcQtdItensEntregues();
   }
 
   addPagto(VendaPagamento vendaPgto) {
@@ -157,6 +166,7 @@ class Venda extends IData {
   }
 }
 
+///******************** VendaPagamento **********************
 class VendaPagamento extends IData {
   late double _vlPgto;
   DateTime dtPagto;
@@ -184,6 +194,7 @@ class VendaPagamento extends IData {
   }
 }
 
+///******************** VendaEntrega **********************
 class VendaEntrega extends IData {
   DateTime dtEntrega;
   late List<VendaItemEntrega> itenEntregues;

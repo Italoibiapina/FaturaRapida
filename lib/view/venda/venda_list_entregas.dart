@@ -54,9 +54,9 @@ class _VendaListEntregasState extends State<VendaListEntregas> {
     final PjBarraSumarizadoraHelper barraSumLstHelper = getBarraSumListaHelper();
 
     final PjBarraSumarizadoraHelper barraSumTotPedHelper = getBarraSumTotPedHelper();
-    final PjBarraSumarizadoraHelper barraSumItemPendHelper = getBarraSumItemPendHelper();
+    final PjBarraSumarizadoraHelper barraSumItemPendHelper = getBarraSumItemPendHelper(venda.qtdItens);
 
-    return PjPageListaScaffold(
+    return PjPageListaScaffoldList(
       titulo: 'Entregas da Venda',
       children: [
         Column(children: [topBarActionHelper.getWidget(), listaDadosHelper.getWidget(), barraSumLstHelper.getWidget()]),
@@ -93,7 +93,7 @@ class _VendaListEntregasState extends State<VendaListEntregas> {
         fontWeight: FontWeight.normal);
   }
 
-  PjBarraSumarizadoraHelper getBarraSumItemPendHelper() {
+  PjBarraSumarizadoraHelper getBarraSumItemPendHelper(int qtdItensVenda) {
     return PjBarraSumarizadoraHelper(
         labelEsq: "Itens Pendentes de Entrega", labelDir: (qtdItensVenda - qtdItensEntregue).toString());
   }
@@ -115,12 +115,6 @@ class _VendaListEntregasState extends State<VendaListEntregas> {
       RetornoForm retornoForm = object as RetornoForm;
       if (!retornoForm.isDelete) venda.addEntrega(retornoForm.objData as VendaEntrega);
     });
-
-    /* await Navigator.of(context).pushNamed(AppRoutes.VENDA_FORM_ENTREGA, arguments: vendaEntrega).then((object) {
-      if (object == null) return;
-      RetornoForm retornoForm = object as RetornoForm;
-      if (!retornoForm.isDelete) venda.addEntrega(retornoForm.objData as VendaEntrega);
-    }); */
     rebuildThisForm();
   }
 

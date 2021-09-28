@@ -7,7 +7,7 @@ class UtilForm {
       bool mandatorio = false,
       bool numerico = false,
       bool decimal = true,
-      int tamMax = 20,
+      int tamMax = 50,
       int tamMin = 0}) {
     List<String> lstErros = [];
 
@@ -49,11 +49,13 @@ class UtilForm {
   }
 
   static String? _valNumDec(String valor) {
+    if (valor == '') return null;
     final isDigitsOnly = double.tryParse(valor);
     return isDigitsOnly == null ? 'Por favor informar apenas números' : null;
   }
 
   static String? _valNumInt(String valor) {
+    if (valor == '') return null;
     final isDigitsOnly = int.tryParse(valor);
     return isDigitsOnly == null ? 'Por favor informar um numérico sem casa decimais' : null;
   }
@@ -131,13 +133,12 @@ class UtilForm {
           TextButton(
             child: Text("Descartar"),
             onPressed: () async {
-              Navigator.of(context).pop(true); // fecha pop de pergunta
+              Navigator.of(context).pop(true);
+              fncDescartar(); // fecha pop de pergunta
             },
           ),
-          TextButton(
-            child: Text("Editar"),
-            onPressed: () => Navigator.of(context).pop(),
-          ),
+          TextButton(child: Text("Editar"), onPressed: () => {} //Navigator.of(context).pop(),
+              ),
         ],
       ),
     ).then((confirmed) async {

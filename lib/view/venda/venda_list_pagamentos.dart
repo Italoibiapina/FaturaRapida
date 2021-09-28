@@ -42,7 +42,7 @@ class _VendaListPagamentosState extends State<VendaListPagamentos> {
     final PjBarraSumarizadoraHelper barraSumTotPedHelper = getBarraSumTotPedHelper();
     final PjBarraSumarizadoraHelper barraSumSldDevHelper = getBarraSumSldDevHelper();
 
-    return PjPageListaScaffold(
+    return PjPageListaScaffoldList(
       titulo: 'Pagamentos da Venda',
       children: [
         Column(children: [topBarActionHelper.getWidget(), listaDadosHelper.getWidget(), barraSumLstHelper.getWidget()]),

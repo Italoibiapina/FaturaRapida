@@ -8,14 +8,17 @@ import 'package:pedido_facil/util/util_list_tile.dart';
 import 'package:provider/provider.dart';
 
 class VendaFormDescFrete extends StatefulWidget {
-  const VendaFormDescFrete({Key? key}) : super(key: key);
+  final Venda venda;
+  const VendaFormDescFrete(this.venda, {Key? key}) : super(key: key);
 
   @override
-  _VendaFormDescFreteState createState() => _VendaFormDescFreteState();
+  _VendaFormDescFreteState createState() => _VendaFormDescFreteState(venda);
 }
 
 class _VendaFormDescFreteState extends State<VendaFormDescFrete> {
-  late final Venda? vendaEdit;
+  late final Venda vendaEdit;
+
+  _VendaFormDescFreteState(this.vendaEdit);
   final _form = GlobalKey<FormState>();
   //final Map<String, String> _formData = {};
 
@@ -30,10 +33,10 @@ class _VendaFormDescFreteState extends State<VendaFormDescFrete> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    vendaEdit = ModalRoute.of(context)!.settings.arguments as Venda;
-    vlDescInputControler.updateValue(vendaEdit!.vlDesconto);
-    vlFreteInputControler.updateValue(vendaEdit!.vlFrete);
-    dsEndEditControler.text = vendaEdit!.dsEnd;
+    //vendaEdit = ModalRoute.of(context)!.settings.arguments as Venda;
+    vlDescInputControler.updateValue(vendaEdit.vlDesconto);
+    vlFreteInputControler.updateValue(vendaEdit.vlFrete);
+    dsEndEditControler.text = vendaEdit.dsEnd;
   }
 
   save() {
@@ -41,9 +44,9 @@ class _VendaFormDescFreteState extends State<VendaFormDescFrete> {
     if (isValid) {
       _form.currentState!.save(); // Chama o metodos save de cada um do campos (TextFormField)
 
-      vendaEdit!.vlDesconto = vlDescInputControler.numberValue;
-      vendaEdit!.vlFrete = vlFreteInputControler.numberValue;
-      vendaEdit!.dsEnd = dsEndEditControler.text;
+      vendaEdit.vlDesconto = vlDescInputControler.numberValue;
+      vendaEdit.vlFrete = vlFreteInputControler.numberValue;
+      vendaEdit.dsEnd = dsEndEditControler.text;
       Navigator.of(context).pop();
     }
   }
@@ -60,7 +63,7 @@ class _VendaFormDescFreteState extends State<VendaFormDescFrete> {
   Widget build(BuildContext context) {
     final provider = Provider.of<VendaProvider>(context, listen: false);
     late List vendasCli = <Venda>[];
-    if (vendaEdit != null) vendasCli = provider.byCliente(vendaEdit!.cli, vendaEdit!);
+    vendasCli = provider.byCliente(vendaEdit.cli, vendaEdit);
 
     final AppBar appBar = AppBar(
       title: Text('Desconto e Valor Entrega'),
@@ -69,7 +72,91 @@ class _VendaFormDescFreteState extends State<VendaFormDescFrete> {
         onPressed: () => save(),
       ),
     );
+
     return Scaffold(
+      resizeToAvoidBottomInset: false,
+      backgroundColor: Util.backColorPadrao,
+      appBar: appBar,
+      body: ListView(
+        padding: const EdgeInsets.all(Util.marginScreenPadrao),
+        children: [
+          UtilFomrDescFrete.getBlockData(
+            marginTop: false,
+            //height: 180,
+            child: Form(
+              key: _form,
+              child: Column(
+                children: [
+                  Container(
+                    padding: paddingField,
+                    child: TextFormField(
+                      autofocus: true,
+                      controller: vlDescInputControler,
+                      keyboardType: TextInputType.number,
+                      textAlign: TextAlign.right,
+                      decoration: InputDecoration(
+                        //labelText: 'Valor de Desconto',
+                        //labelStyle: lebelStyle,
+                        border: InputBorder.none,
+                        prefixText: 'Desconto:',
+                        prefixStyle: labelStyle,
+                      ),
+                    ),
+                  ),
+                  Container(
+                    //width: 150,
+                    padding: paddingField,
+                    //decoration: UtilListTile.boxDecorationPadrao,
+                    child: TextFormField(
+                      keyboardType: TextInputType.number,
+                      controller: vlFreteInputControler,
+                      textAlign: TextAlign.right,
+                      decoration: InputDecoration(
+                        border: InputBorder.none,
+                        prefixText: 'Valor da entrega:',
+                        prefixStyle: labelStyle,
+                      ),
+                    ),
+                  ),
+                  Container(
+                    padding: paddingField,
+                    child: TextFormField(
+                      /* initialValue: _formData['dsEnd'],
+                        onSaved: (value) => _formData['dsEnd'] = value!, */
+                      controller: dsEndEditControler,
+                      keyboardType: TextInputType.multiline,
+                      maxLines: 2,
+                      decoration: InputDecoration(
+                        labelText: 'Endereço da Entrega:',
+                        floatingLabelBehavior: FloatingLabelBehavior.always,
+                        labelStyle: labelStyleFloat,
+                        border: InputBorder.none,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          UtilFomrDescFrete.getBlockData(
+            child: vendasCli.length > 0
+                ? ListView.builder(
+                    shrinkWrap: true, //para expandir o widget Pai
+                    itemCount: vendasCli.length > 0 ? vendasCli.length + 1 : vendasCli.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      if (index == 0) return UtilFomrDescFrete.getTituloListHist();
+                      index -= 1;
+                      return UtilFomrDescFrete.getListHistTile(vendasCli[index], selectFrete);
+                    },
+                  )
+                : const Center(child: Text('No items')),
+            //),
+          ),
+        ],
+      ),
+    );
+
+    /* return Scaffold(
       backgroundColor: Util.backColorPadrao,
       appBar: appBar,
       body: ListView(
@@ -132,7 +219,7 @@ class _VendaFormDescFreteState extends State<VendaFormDescFrete> {
                   ],
                 ),
               )),
-          UtilFomrDescFrete.getBlockData(
+           UtilFomrDescFrete.getBlockData(
             child: vendasCli.length > 0
                 ? ListView.builder(
                     shrinkWrap: true, //para expandir o widget Pai
@@ -148,7 +235,7 @@ class _VendaFormDescFreteState extends State<VendaFormDescFrete> {
           ),
         ],
       ),
-    );
+    ); */
   }
 }
 

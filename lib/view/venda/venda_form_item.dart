@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_masked_text2/flutter_masked_text2.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:pedido_facil/models/produto.dart';
+import 'package:pedido_facil/models/util/retorno_form.dart';
 import 'package:pedido_facil/models/venda_item.dart';
 import 'package:pedido_facil/provider/produto_provider.dart';
 import 'package:pedido_facil/util/util.dart';
@@ -10,35 +11,33 @@ import 'package:pedido_facil/util/util_form.dart';
 import 'package:pedido_facil/util/util_list_tile.dart';
 
 class VendaFormItem extends StatefulWidget {
-  const VendaFormItem({Key? key}) : super(key: key);
+  final VendaItem vendaItem;
+  const VendaFormItem(this.vendaItem, {Key? key}) : super(key: key);
 
   @override
-  _VendaFormItemState createState() => _VendaFormItemState();
+  _VendaFormItemState createState() => _VendaFormItemState(vendaItem);
 }
 
 class _VendaFormItemState extends State<VendaFormItem> {
-  late VendaItem vendaItem =
-      VendaItem(id: DateTime.now().toString(), prod: Produto(id: 'novoItem', nm: '', vlVenda: 0));
+  late VendaItem vendaItem;
+
+  _VendaFormItemState(this.vendaItem);
+
   final _form = GlobalKey<FormState>();
   final Map<String, String> _formData = {};
   bool isNewRec = true;
 
   final TextEditingController _typeAheadController = TextEditingController();
   final vlVendaControler = MoneyMaskedTextController(leftSymbol: 'R\$ ');
-  //final qtdControler = MoneyMaskedTextController();
 
   /// Usar este metodos para quando refazer o parte grafica "Build method" não precisar
   /// reexecutar o codigo contido neste metodo.
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    if (ModalRoute.of(context)!.settings.arguments != null) {
-      vendaItem = ModalRoute.of(context)!.settings.arguments as VendaItem;
-      //_formData['nmProd'] = vendaItem.prod.nm;
-      this._typeAheadController.text = vendaItem.prod.nm;
-      vlVendaControler.updateValue(vendaItem.prod.vlVenda);
-      isNewRec = false;
-    }
+    this._typeAheadController.text = vendaItem.prod.nm;
+    vlVendaControler.updateValue(vendaItem.prod.vlVenda);
+    isNewRec = false;
     _formData['qtd'] = vendaItem.qtd.toString();
   }
 
@@ -50,13 +49,14 @@ class _VendaFormItemState extends State<VendaFormItem> {
       vendaItem.prod.vlVenda = vlVendaControler.numberValue;
       vendaItem.qtd = int.parse(_formData['qtd'].toString());
 
-      Navigator.of(context).pop(vendaItem);
-    } else {
+      Navigator.of(context).pop(RetornoForm(objData: vendaItem));
+    }
+    /*  else {
       if (isNewRec) {
         if ((_formData['nmProd'].toString() == "" || _formData['nmProd'] == null) &&
             _formData['qtd'].toString() == "" &&
             vlVendaControler.numberValue == 0.0) {
-          Navigator.of(context).pop();
+          Navigator.of(context).pop(vendaItem);
         } else {
           UtilForm.showDialogEditarDescartar(
             context,
@@ -66,15 +66,16 @@ class _VendaFormItemState extends State<VendaFormItem> {
           );
         }
       }
-    }
+    } */
   }
 
   @override
   Widget build(BuildContext context) {
     final _botoes = <Widget>[];
-    if (!isNewRec)
-      _botoes
-          .add(IconButton(icon: Icon(Icons.delete), onPressed: () => Navigator.of(context).pop()));
+    _botoes.add(IconButton(
+        icon: Icon(Icons.delete),
+        onPressed: () => Navigator.of(context).pop(RetornoForm(isDelete: true, objData: vendaItem))));
+
     final AppBar appBar = AppBar(
       title: Text('Item da Venda'),
       leading: new IconButton(
@@ -107,8 +108,7 @@ class _VendaFormItemState extends State<VendaFormItem> {
                 noItemsFoundBuilder: (context) => Container(
                   height: 40,
                   child: Center(
-                    child: Text('Nenhum produto encontrado.',
-                        style: TextStyle(fontSize: 14, color: Colors.grey)),
+                    child: Text('Nenhum produto encontrado.', style: TextStyle(fontSize: 14, color: Colors.grey)),
                   ),
                 ),
                 itemBuilder: (context, Produto? suggestion) {
@@ -118,8 +118,7 @@ class _VendaFormItemState extends State<VendaFormItem> {
                     child: ListTile(
                       visualDensity: VisualDensity(horizontal: 0, vertical: -3),
                       title: Text(prod.nm, style: TextStyle(fontSize: 14)),
-                      trailing: Text(Util.toCurency(prod.vlVenda),
-                          style: TextStyle(fontSize: 14, color: Colors.grey)),
+                      trailing: Text(Util.toCurency(prod.vlVenda), style: TextStyle(fontSize: 14, color: Colors.grey)),
                     ),
                   );
                 },
@@ -129,8 +128,7 @@ class _VendaFormItemState extends State<VendaFormItem> {
                   vlVendaControler.updateValue(prod.vlVenda);
                 },
                 validator: (value) {
-                  return UtilForm.valTextFormField(
-                      valor: value.toString(), mandatorio: true, tamMax: 50);
+                  return UtilForm.valTextFormField(valor: value.toString(), mandatorio: true, tamMax: 50);
                 },
               ),
               /* TextFormField(
@@ -153,8 +151,7 @@ class _VendaFormItemState extends State<VendaFormItem> {
                 keyboardType: TextInputType.number,
                 decoration: InputDecoration(labelText: 'Quantidade', hintText: '1'),
                 validator: (value) {
-                  return UtilForm.valTextFormField(
-                      valor: value.toString(), tamMax: 4, numerico: true);
+                  return UtilForm.valTextFormField(valor: value.toString(), tamMax: 4, numerico: true);
                 },
                 onSaved: (value) => _formData['qtd'] = value!,
               ),

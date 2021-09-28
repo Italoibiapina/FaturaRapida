@@ -23,7 +23,7 @@ class _VendaFormEntregaState extends State<VendaFormEntrega> {
 
   final _form = GlobalKey<FormState>();
   final Map<String, String> _formData = {};
-  bool isNewRec = true;
+  //bool isNewRec = true;
 
   final vMeioPagtoTextEditControler = TextEditingController();
   final vlPagtoControler = MoneyMaskedTextController(leftSymbol: 'R\$ ');
@@ -41,12 +41,12 @@ class _VendaFormEntregaState extends State<VendaFormEntrega> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    if (ModalRoute.of(context)!.settings.arguments != null) {
-      //vendaEntrega = ModalRoute.of(context)!.settings.arguments as VendaEntrega;
-      _formData['entreguePara'] = vendaEntrega.entreguePara;
-      _formData['obs'] = vendaEntrega.obs;
-      isNewRec = false;
-    }
+    //if (ModalRoute.of(context)!.settings.arguments != null) {
+    //vendaEntrega = ModalRoute.of(context)!.settings.arguments as VendaEntrega;
+    _formData['entreguePara'] = vendaEntrega.entreguePara;
+    _formData['obs'] = vendaEntrega.obs;
+    //isNewRec = false;
+    //}
     vDtControler.text = Util.toDateFormat(vendaEntrega.dtEntrega);
   }
 
@@ -63,10 +63,10 @@ class _VendaFormEntregaState extends State<VendaFormEntrega> {
   @override
   Widget build(BuildContext context) {
     final _botoes = <Widget>[];
-    if (!isNewRec)
-      _botoes.add(IconButton(
-          icon: Icon(Icons.delete),
-          onPressed: () => Navigator.of(context).pop(RetornoForm(isDelete: true, objData: vendaEntrega))));
+    //if (!isNewRec)
+    _botoes.add(IconButton(
+        icon: Icon(Icons.delete),
+        onPressed: () => Navigator.of(context).pop(RetornoForm(isDelete: true, objData: vendaEntrega))));
 
     final AppBar appBar = AppBar(
       title: Text('Entrega da Venda'),
@@ -78,6 +78,7 @@ class _VendaFormEntregaState extends State<VendaFormEntrega> {
     );
 
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       backgroundColor: Util.backColorPadrao,
       appBar: appBar,
       body: ListView(
